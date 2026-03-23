@@ -1,20 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface CounterState {
-  value: number;
-}
+export interface CounterState {}
 
-const initialState: CounterState = {
-  value: 0,
-};
+const initialState: CounterState = {};
 
-export const counterSlice = createSlice({
-  name: "counter",
+export const slice = createSlice({
+  name: "learnFlow",
   initialState,
   reducers: {},
 });
 
 // Action creators are generated for each case reducer function
-export const {} = counterSlice.actions;
+export const {} = slice.actions;
 
-export default counterSlice.reducer;
+export default slice.reducer;
