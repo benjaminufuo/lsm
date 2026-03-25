@@ -1,8 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface CounterState {}
+export interface CounterState {
+  userData: {};
+}
 
-const initialState: CounterState = {};
+const initialState: CounterState = {
+  userData: {},
+};
 
 export const slice = createSlice({
   name: "learnFlow",
