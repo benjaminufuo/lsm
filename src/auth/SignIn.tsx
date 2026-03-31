@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import type { FC } from "react";
 import { LuCheck } from "react-icons/lu";
@@ -77,7 +77,7 @@ const SignIn: FC = () => {
     }
 
     console.log("Login:", formData);
-    navigate("/dashboard");
+    navigate("/learnflow/dashboard");
   };
 
   const stats = [
@@ -268,7 +268,7 @@ const SignIn: FC = () => {
             <p className="text-gray-600">
               Don't have an account?{" "}
               <span
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate("/learnflow/dashboard")}
                 className="text-purple-600 hover:text-purple-700 font-semibold"
               >
                 Sign up

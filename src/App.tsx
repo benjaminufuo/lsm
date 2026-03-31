@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainHolder from "./routes/MainHolder";
 import SignIn from "./auth/SignIn";
 import SignUp from "./auth/SignUp";
@@ -31,22 +31,22 @@ const App = () => {
       element: <MainHolder />,
       children: [
         {
-          path: 'dashboard',
+          path: "dashboard",
           element: <Dashboard />,
         },
         {
           path: "courses",
-          element: <Cousrse/>
+          element: <Cousrse />,
         },
         {
           path: "assignments",
-          element: <Assignments />
+          element: <Assignments />,
         },
         {
           path: "profile",
-          element: <Profile />
-        }
-      ]
+          element: <Profile />,
+        },
+      ],
     },
   ]);
 
