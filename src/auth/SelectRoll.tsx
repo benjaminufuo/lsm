@@ -2,7 +2,7 @@ import { useState } from "react";
 import { type IconType } from "react-icons";
 import { LuGraduationCap, LuLayoutDashboard, LuCheck } from "react-icons/lu";
 import Button from "../shared/Button/Index";
-import { useNavigate} from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const SelectRoll = () => {
   const navigate = useNavigate();
@@ -98,7 +98,7 @@ const SelectRoll = () => {
         Already have an account?{" "}
         <span
           className="text-primary cursor-pointer"
-          onClick={() => navigate("")}
+          onClick={() => navigate("/signin")}
         >
           Log in
         </span>
