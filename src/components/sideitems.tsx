@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink } from "react-router-dom";
 import type { NavItemType } from "../data/types";
 import type { IconType } from "react-icons";
 import { cn } from "../lib/utils";
