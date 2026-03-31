@@ -194,35 +194,36 @@ const SignIn: FC = () => {
               size="small"
             />
 
-            {/* Remember Me */}
-            <div className="flex items-start gap-3">
-              <div className="relative flex items-center justify-center mt-1">
-                <input
-                  type="checkbox"
-                  name="agreeToTerms"
-                  id="terms"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
-                  className="peer appearance-none w-4 h-4 border border-gray-300 rounded-full checked:bg-[#7b61ff] checked:border-[#7b61ff] focus:outline-none focus:ring-2 focus:ring-[#7b61ff] focus:ring-offset-1 cursor-pointer transition-all"
-                />
-                <LuCheck
-                  size={12}
-                  className="absolute inset-0 m-auto text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity stroke-2"
-                />
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    name="rememberMe"
+                    id="rememberMe"
+                    checked={formData.rememberMe}
+                    onChange={handleChange}
+                    className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all checked:border-[#7b61ff] checked:bg-[#7b61ff] focus:outline-none focus:ring-2 focus:ring-[#7b61ff] focus:ring-offset-1"
+                  />
+                  <LuCheck
+                    size={12}
+                    className="pointer-events-none absolute inset-0 m-auto text-white opacity-0 transition-opacity stroke-2 peer-checked:opacity-100"
+                  />
+                </div>
+                <label
+                  htmlFor="rememberMe"
+                  className="cursor-pointer text-sm text-gray-600"
+                >
+                  Remember me
+                </label>
               </div>
-              <label
-                htmlFor="terms"
-                className="text-sm text-gray-600 cursor-pointer"
+              <a
+                href="#"
+                className="text-sm font-medium text-purple-600 hover:underline"
               >
-                I agree to the{" "}
-                <a href="#" className="text-purple-600 hover:underline">
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="#" className="text-purple-600 hover:underline">
-                  Privacy Policy
-                </a>
-              </label>
+                Forgot password?
+              </a>
             </div>
 
             {/* Login Button */}
@@ -266,12 +267,12 @@ const SignIn: FC = () => {
           <div className="mt-8 text-center">
             <p className="text-gray-600">
               Don't have an account?{" "}
-              <a
-                href="#"
+              <span
+                onClick={() => navigate("/signup")}
                 className="text-purple-600 hover:text-purple-700 font-semibold"
               >
                 Sign up
-              </a>
+              </span>
             </p>
           </div>
         </div>

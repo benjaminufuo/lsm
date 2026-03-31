@@ -3,8 +3,13 @@ import MainHolder from "./routes/MainHolder";
 import SignIn from "./auth/SignIn";
 import SignUp from "./auth/SignUp";
 import SelectRoll from "./auth/SelectRoll";
+import ErrorPage from "./components/ErrorPage";
 const App = () => {
   const router = createBrowserRouter([
+    {
+      path: "*",
+      element: <ErrorPage />,
+    },
     {
       path: "/",
       element: <SelectRoll />,
