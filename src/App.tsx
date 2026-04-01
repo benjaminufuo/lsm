@@ -9,6 +9,9 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Cousrse from "./pages/courses/courses";
 import Assignments from "./pages/assignments/assignment";
 import Profile from "./pages/profile/profile";
+import ForgotPassword from "./auth/ForgetPassword";
+import CheckEmail from "./auth/CheckEmail";
+import CreatePassword from "./auth/CreatePassword";
 const App = () => {
   const router = createBrowserRouter([
     {
@@ -26,6 +29,18 @@ const App = () => {
     {
       path: "/signup",
       element: <SignUp />,
+    },
+    {
+      path: "/forgot-password",
+      element: <ForgotPassword />,
+    },
+    {
+      path: "/check-email",
+      element: <CheckEmail />,
+    },
+    {
+      path: "create-password",
+      element: <CreatePassword />,
     },
     {
       path: "/learnflow",
