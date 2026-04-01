@@ -11,6 +11,7 @@ import { FcGoogle } from "react-icons/fc";
 import Button from "../shared/Button/Index";
 import Input from "../shared/Input/Index";
 import leftimg from "../assets/signupleftbg.jpg";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const location = useLocation();
@@ -28,6 +29,7 @@ const SignUp = () => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -97,15 +99,28 @@ const SignUp = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    console.log("Form submitted:", { ...formData, role });
-    navigate("/signin");
+    setLoading(true);
+    try {
+      // --- API Call Simulation ---
+      console.log("Submitting:", formData);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      toast.success("Account created successfully! Please log in.");
+      setTimeout(() => {
+        navigate("/signin");
+      }, 1500);
+    } catch (error) {
+      toast.error("An error occurred during signup. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -196,7 +211,7 @@ const SignUp = () => {
       </div>
 
       {/* Right Side - Signup Form */}
-      <div className="w-full md:w-2/5 bg-gray-50 flex items-center justify-center p-6 md:p-12">
+      <div className="w-full md:w-2/5 bg-gray-50 flex items-center justify-center px-4 py-6 md:p-12">
         <div className="w-full max-w-md">
           {/* Back Link */}
           <Button
@@ -317,6 +332,7 @@ const SignUp = () => {
               type="submit"
               fullWidth
               disabled={!isFormValid()}
+              loading={loading}
               className="rounded-[15px]"
             >
               Create Account

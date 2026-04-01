@@ -93,10 +93,11 @@ const Button = (props: ButtonProps) => {
       className={buttonClasses}
       style={style}
     >
-      {loading && (
-        <span className="w-4 h-4 border-2 border-transparent border-t-current rounded-full animate-spin"></span>
+      {loading ? (
+        <span className="w-5 h-5 border-2 border-transparent border-t-current rounded-full animate-spin"></span>
+      ) : (
+        content
       )}
-      {content}
     </button>
   );
 };
