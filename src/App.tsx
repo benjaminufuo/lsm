@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainHolder from "./routes/MainHolder";
+import PrivateRoute from "./routes/PrivateRoute";
 import SignIn from "./auth/SignIn";
 import SignUp from "./auth/SignUp";
 import SelectRoll from "./auth/SelectRoll";
@@ -28,23 +29,28 @@ const App = () => {
     },
     {
       path: "/learnflow",
-      element: <MainHolder />,
+      element: <PrivateRoute />,
       children: [
         {
-          path: "dashboard",
-          element: <Dashboard />,
-        },
-        {
-          path: "courses",
-          element: <Cousrse />,
-        },
-        {
-          path: "assignments",
-          element: <Assignments />,
-        },
-        {
-          path: "profile",
-          element: <Profile />,
+          element: <MainHolder />,
+          children: [
+            {
+              path: "dashboard",
+              element: <Dashboard />,
+            },
+            {
+              path: "courses",
+              element: <Cousrse />,
+            },
+            {
+              path: "assignments",
+              element: <Assignments />,
+            },
+            {
+              path: "profile",
+              element: <Profile />,
+            },
+          ],
         },
       ],
     },

@@ -36,7 +36,7 @@ const SelectRoll = () => {
   ];
 
   return (
-    <main className="w-full h-full flex py-10 px-10 flex-col items-center justify-center gap-10">
+    <main className="w-full h-full flex flex-col items-center justify-center gap-10 px-4 py-10 md:px-10">
       <h1 className="relative pb-2 font-family-inter text-[36px] text-primary font-bold after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1/4 after:bg-current after:rounded-full">
         TalentFlow
       </h1>
@@ -57,7 +57,7 @@ const SelectRoll = () => {
             <div
               key={role.title}
               onClick={() => setSelectedRole(role.buttonText || null)}
-              className={`relative group w-[350px] h-[240px] p-4 border-[2px] rounded-[15px] flex flex-col items-start justify-center gap-4 transition-colors duration-500 ease-in-out cursor-pointer ${
+              className={`relative group w-full max-w-[400px] h-[240px] p-4 border-[2px] rounded-[15px] flex flex-col items-start justify-center gap-4 transition-colors duration-500 ease-in-out cursor-pointer ${
                 isSelected
                   ? "border-primary"
                   : "border-bordercolor hover:border-primary"
