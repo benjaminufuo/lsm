@@ -257,12 +257,12 @@ const SignIn: FC = () => {
                   Remember me
                 </label>
               </div>
-              <a
-                href="#"
+              <span
+                onClick={() => navigate("/forgot-password")}
                 className="text-sm font-medium text-purple-600 hover:underline"
               >
                 Forgot password?
-              </a>
+              </span>
             </div>
 
             {/* Login Button */}
