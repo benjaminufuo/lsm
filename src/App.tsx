@@ -8,6 +8,9 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Cousrse from "./pages/courses/courses";
 import Assignments from "./pages/assignments/assignment";
 import Profile from "./pages/profile/profile";
+import CourseDetail from "./pages/courses/courseDetail";
+import Overview from "./pages/courses/overview";
+
 const App = () => {
   const router = createBrowserRouter([
     {
@@ -37,6 +40,16 @@ const App = () => {
         {
           path: "courses",
           element: <Cousrse />,
+        },
+        {
+          path: "courses/:courseId",
+          element: <CourseDetail />,
+          children: [
+            {
+              path: "overview",
+              element: <Overview />,
+            },
+          ],
         },
         {
           path: "assignments",
