@@ -76,6 +76,7 @@ export const ForgotPassword = (): React.ReactNode => {
             type="submit"
             fullWidth
             loading={loading}
+            loadingText="Sending..."
             disabled={!email.trim() || submitted}
             className="rounded-[15px]"
           >

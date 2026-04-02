@@ -75,27 +75,35 @@ const App = () => {
         },
         {
           path: "admin",
-          element: <AdminLayout />,
+          element: <PrivateRoute allowableRoles={["admin"]} />,
+          errorElement: <ErrorPage />,
+
           children: [
             {
-              index: true,
-              element: <AdminDashboardPage />,
-            },
-            {
-              path: "dashboard",
-              element: <AdminDashboardPage />,
-            },
-            {
-              path: "courses",
-              element: <AdminCoursesPage />,
-            },
-            {
-              path: "assignments",
-              element: <AdminAssignmentsPage />,
-            },
-            {
-              path: "users",
-              element: <AdminUsersPage />,
+              path: "",
+              element: <AdminLayout />,
+              children: [
+                {
+                  index: true,
+                  element: <AdminDashboardPage />,
+                },
+                {
+                  path: "dashboard",
+                  element: <AdminDashboardPage />,
+                },
+                {
+                  path: "courses",
+                  element: <AdminCoursesPage />,
+                },
+                {
+                  path: "assignments",
+                  element: <AdminAssignmentsPage />,
+                },
+                {
+                  path: "users",
+                  element: <AdminUsersPage />,
+                },
+              ],
             },
           ],
         },

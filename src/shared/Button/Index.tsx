@@ -6,6 +6,7 @@ interface ButtonProps {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   loading?: boolean;
+  loadingText?: string;
   variant?: "primary" | "secondary" | "outline" | "ghost";
   size?: "small" | "medium" | "large";
   className?: string;
@@ -23,6 +24,7 @@ const Button = (props: ButtonProps) => {
     onClick,
     disabled,
     loading,
+    loadingText,
     variant = "primary",
     size = "medium",
     className,
@@ -41,13 +43,13 @@ const Button = (props: ButtonProps) => {
 
   const variantClasses: Record<string, string> = {
     primary:
-      "bg-primary text-white hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed",
+      "bg-primary text-white hover:brightness-110 disabled:hover:brightness-100 disabled:opacity-60 disabled:cursor-not-allowed",
     secondary:
-      "bg-gray-500 text-white hover:bg-gray-600 disabled:opacity-60 disabled:cursor-not-allowed",
+      "bg-gray-500 text-white hover:bg-gray-600 disabled:hover:bg-gray-500 disabled:opacity-60 disabled:cursor-not-allowed",
     outline:
-      "border border-primary text-primary bg-transparent hover:bg-primary hover:text-white disabled:opacity-60 disabled:cursor-not-allowed",
+      "border border-primary text-primary bg-transparent hover:bg-primary hover:text-white disabled:hover:bg-transparent disabled:hover:text-primary disabled:opacity-60 disabled:cursor-not-allowed",
     ghost:
-      "bg-transparent text-gray-600 hover:bg-gray-100 disabled:opacity-60 disabled:cursor-not-allowed",
+      "bg-transparent text-gray-600 hover:bg-gray-100 disabled:hover:bg-transparent disabled:opacity-60 disabled:cursor-not-allowed",
   };
 
   const sizeClasses: Record<string, string> = {
@@ -94,7 +96,10 @@ const Button = (props: ButtonProps) => {
       style={style}
     >
       {loading ? (
-        <span className="w-5 h-5 border-2 border-transparent border-t-current rounded-full animate-spin"></span>
+        <>
+          <span className="w-5 h-5 border-2 border-transparent border-t-current rounded-full animate-spin shrink-0"></span>
+          {loadingText || children || label}
+        </>
       ) : (
         content
       )}
