@@ -12,6 +12,12 @@ import Profile from "./pages/profile/profile";
 import ForgotPassword from "./auth/ForgetPassword";
 import CheckEmail from "./auth/CheckEmail";
 import CreatePassword from "./auth/CreatePassword";
+import AdminLayout from "./layouts/AdminLayout";
+import AdminDashboardPage from "./modules/admin/pages/AdminDashboardPage";
+import AdminCoursesPage from "./modules/admin/pages/AdminCoursesPage";
+import AdminAssignmentsPage from "./modules/admin/pages/AdminAssignmentsPage.tsx";
+import AdminUsersPage from "./modules/admin/pages/AdminUsersPage";
+
 const App = () => {
   const router = createBrowserRouter([
     {
@@ -39,7 +45,7 @@ const App = () => {
       element: <CheckEmail />,
     },
     {
-      path: "create-password",
+      path: "/create-password",
       element: <CreatePassword />,
     },
     {
@@ -64,6 +70,32 @@ const App = () => {
             {
               path: "profile",
               element: <Profile />,
+            },
+          ],
+        },
+        {
+          path: "admin",
+          element: <AdminLayout />,
+          children: [
+            {
+              index: true,
+              element: <AdminDashboardPage />,
+            },
+            {
+              path: "dashboard",
+              element: <AdminDashboardPage />,
+            },
+            {
+              path: "courses",
+              element: <AdminCoursesPage />,
+            },
+            {
+              path: "assignments",
+              element: <AdminAssignmentsPage />,
+            },
+            {
+              path: "users",
+              element: <AdminUsersPage />,
             },
           ],
         },
