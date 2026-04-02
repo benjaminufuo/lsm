@@ -2,8 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import type { FC } from "react";
 import { LuCheck } from "react-icons/lu";
-import { MdOutlineArrowBack } from "react-icons/md";
-import { MdOutlineMail } from "react-icons/md";
+import { MdOutlineArrowBack, MdOutlineMail } from "react-icons/md";
 import { IoLockClosedOutline } from "react-icons/io5";
 import { FcGoogle } from "react-icons/fc";
 import Button from "../shared/Button/Index";
@@ -87,14 +86,22 @@ const SignIn: FC = () => {
       console.log("Attempting to log in with:", formData);
       const response = await new Promise<{
         token: string;
-        user: { name: string; email: string };
+        user: { name: string; email: string; role: string };
       }>((resolve, reject) => {
         setTimeout(() => {
           // Simulate a successful login for demonstration
           if (formData.email.includes("@") && formData.password.length >= 6) {
+            // Mock a role based on the email address for testing
+            const simulatedRole = formData.email.includes("admin")
+              ? "admin"
+              : "student";
             resolve({
               token: "a-real-jwt-token-from-your-api",
-              user: { name: "Test User", email: formData.email },
+              user: {
+                name: "Test User",
+                email: formData.email,
+                role: simulatedRole,
+              },
             });
           } else {
             // Simulate a failed login
@@ -108,7 +115,11 @@ const SignIn: FC = () => {
       dispatch(setUserInfo(response.user));
 
       toast.success("Logged in successfully!");
-      navigate("/learnflow/dashboard");
+      if (response.user.role === "admin") {
+        navigate("/learnflow/admin");
+      } else {
+        navigate("/learnflow/dashboard");
+      }
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "An unknown error occurred.";
@@ -271,6 +282,7 @@ const SignIn: FC = () => {
               fullWidth
               disabled={!isFormValid()}
               loading={loading}
+              loadingText="Logging in..."
               className="rounded-[15px]"
             >
               Log In
