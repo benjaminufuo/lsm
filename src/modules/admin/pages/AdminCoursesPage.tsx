@@ -29,7 +29,7 @@ export default function AdminCoursesPage() {
         </p>
       </div>
 
-      <div className="rounded-3xl bg-white p-6 shadow-sm">
+      <div className="rounded-xl bg-white p-6 shadow-sm">
         <h1 className="text-2xl mt-10 text-slate-900">Course Details</h1>
         <label
           htmlFor="cover-image"
