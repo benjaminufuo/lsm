@@ -85,6 +85,7 @@ const CheckEmail: React.FC = () => {
               onClick={handleResendEmail}
               fullWidth
               loading={loading}
+              loadingText="Sending..."
               disabled={resendClicked}
               className="rounded-[15px]"
             >

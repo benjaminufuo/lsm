@@ -46,32 +46,6 @@ const SignUp = () => {
     }
   };
 
-  const isFormValid = (): boolean => {
-    // Check if all fields are filled
-    if (
-      !formData.fullName.trim() ||
-      !formData.email.trim() ||
-      !formData.password ||
-      !formData.confirmPassword ||
-      !formData.agreeToTerms
-    ) {
-      return false;
-    }
-
-    // Check validation rules
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      return false;
-    }
-    if (formData.password.length < 6) {
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      return false;
-    }
-
-    return true;
-  };
-
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -109,7 +83,11 @@ const SignUp = () => {
     setLoading(true);
     try {
       // --- API Call Simulation ---
-      console.log("Submitting:", formData);
+      const payload = {
+        ...formData,
+        role: isStudent ? "student" : "admin",
+      };
+      console.log("Submitting:", payload);
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       toast.success("Account created successfully! Please log in.");
@@ -331,8 +309,8 @@ const SignUp = () => {
             <Button
               type="submit"
               fullWidth
-              disabled={!isFormValid()}
               loading={loading}
+              loadingText="Creating..."
               className="rounded-[15px]"
             >
               Create Account
@@ -347,17 +325,15 @@ const SignUp = () => {
           </div>
 
           {/* OAuth Buttons */}
-          <div className="flex">
-            <Button
-              variant="outline"
-              fullWidth
-              icon={<FcGoogle size={20} />}
-              className="rounded-[15px]"
-              style={{ borderColor: "#d1d5db" }}
-            >
-              Google
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            fullWidth
+            icon={<FcGoogle size={20} />}
+            className="rounded-[15px]"
+            style={{ borderColor: "#d1d5db" }}
+          >
+            Google
+          </Button>
 
           {/* Login Link */}
           <div className="mt-8 text-center">

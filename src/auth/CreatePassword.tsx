@@ -199,6 +199,7 @@ export default function CreatePassword({
             type="submit"
             fullWidth
             loading={loading}
+            loadingText="Resetting..."
             disabled={!isFormValid}
             className="rounded-[15px]"
           >
