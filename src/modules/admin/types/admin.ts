@@ -23,3 +23,24 @@ export type Assignment = {
   dueDate: string;
   image: string;
 };
+
+export type UserTab = "students" | "admins";
+
+export type StudentUser = {
+  id: string;
+  name: string;
+  role: string;
+  enrolledCourse: string;
+  progress: number;
+  joined: string;
+  avatar: string;
+};
+
+export type AdminUser = {
+  id: string;
+  name: string;
+  role: string;
+  email: string;
+  joined: string;
+  avatar: string;
+};
