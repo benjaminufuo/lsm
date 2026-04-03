@@ -66,11 +66,11 @@ const Header = () => {
               lg:w-auto lg:opacity-100
             "
           >
-            <LearnFlowIcon />
+            <LearnFlowIcon/>
           </div>
         </div>
 
-        <div className="flex flex-row items-center bg-[#F5F7FA] rounded-full w-4/6 h-11  px-2 gap-3 text-black">
+        <div className="flex flex-row items-center bg-[#F5F7FA] rounded-full w-5/12 h-11  px-2 gap-3 text-black">
           <SearchIcon size={24} />
           <input
             type="text"
