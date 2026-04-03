@@ -33,7 +33,7 @@ const SideBar = () => {
               md:w-0 md:opacity-0
               md:group-hover:w-auto md:group-hover:opacity-100
 
-              lg:w-auto lg:opacity-100
+              lg:w-auto lg:opacity-100 
             "
           >
             LearnFlow
