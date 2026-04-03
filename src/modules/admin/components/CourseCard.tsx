@@ -7,7 +7,7 @@ type Props = {
 export default function CourseCard({ course }: Props) {
   return (
     <article className="flex gap-4 rounded-2xl border border-slate-200/60 bg-white/90 p-4 backdrop-blur shadow-[0_8px_30px_rgba(0,0,0,0.05)]">
-      <div className="h-16 w-16 overflow-hidden rounded-xl bg-slate-100">
+      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100">
         <img
           src={course.image}
           alt={course.title}
