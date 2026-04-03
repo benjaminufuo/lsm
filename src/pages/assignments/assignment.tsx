@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { IoCalendarOutline } from "react-icons/io5";
-import { LuClipboardList, LuClock, LuSend, LuTrendingUp, LuStar } from "react-icons/lu";
+import { IoCalendarOutline, IoTimeOutline } from "react-icons/io5";
+import { LuClipboardList, LuClock, LuSend, LuTrendingUp, LuStar, LuInfo } from "react-icons/lu";
 
 interface Assignment {
   id: number;
@@ -48,16 +48,16 @@ const assignmentsData: Assignment[] = [
     course: "Data Science with Python",
     description: "Analyze a dataset and present findings with visualizations.",
     status: "submitted",
-    dueDate: "Mar 10, 2026",
+    dueDate: "Mar 18, 2026",
     daysLeft: 0,
-    submittedDate: "Mar 10, 2026",
+    submittedDate: "Mar 18, 2026",
   },
   {
     id: 5,
     title: "Design System Documentation",
     course: "UI/UX Design Fundamentals",
     description: "Create comprehensive documentation for a design system.",
-    status: "completed",
+    status: "submitted",
     dueDate: "Mar 14, 2026",
     daysLeft: 0,
     submittedDate: "Mar 14, 2026",
@@ -68,7 +68,7 @@ const assignmentsData: Assignment[] = [
     title: "Python Data Structures Quiz",
     course: "Data Science with Python",
     description: "Complete quiz on advanced Python data structures.",
-    status: "completed",
+    status: "submitted",
     dueDate: "Mar 10, 2026",
     daysLeft: 0,
     submittedDate: "Mar 10, 2026",
@@ -102,33 +102,33 @@ const Assignments = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl p-4 border border-bordercolor flex items-center justify-between">
-          <div>
-            <p className="text-xs text-stext mb-1">Total Assignments</p>
-            <p className="text-2xl font-bold text-ptext">6</p>
+        <div className="bg-white rounded-xl p-4 border border-bordercolor flex flex-col justify-between gap-4">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-stext">Total Assignments</p>
+            <LuClipboardList size={18} className="text-primary" />
           </div>
-          <LuClipboardList size={22} className="text-stext opacity-50" />
+          <p className="text-2xl font-bold text-ptext">6</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bordercolor flex items-center justify-between">
-          <div>
-            <p className="text-xs text-stext mb-1">Pending</p>
-            <p className="text-2xl font-bold text-ptext">3</p>
+        <div className="bg-white rounded-xl p-4 border border-bordercolor flex flex-col justify-between gap-4">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-stext">Pending</p>
+            <LuClock size={18} className="text-primary" />
           </div>
-          <LuClock size={22} className="text-stext opacity-50" />
+          <p className="text-2xl font-bold text-ptext">3</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bordercolor flex items-center justify-between">
-          <div>
-            <p className="text-xs text-stext mb-1">Submitted</p>
-            <p className="text-2xl font-bold text-ptext">1</p>
+        <div className="bg-white rounded-xl p-4 border border-bordercolor flex flex-col justify-between gap-4">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-stext">Submitted</p>
+            <LuSend size={18} className="text-primary" />
           </div>
-          <LuSend size={22} className="text-stext opacity-50" />
+          <p className="text-2xl font-bold text-ptext">1</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bordercolor flex items-center justify-between">
-          <div>
-            <p className="text-xs text-stext mb-1">Average Grade</p>
-            <p className="text-2xl font-bold text-ptext">91.5%</p>
+        <div className="bg-white rounded-xl p-4 border border-bordercolor flex flex-col justify-between gap-4">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-stext">Average Grade</p>
+            <LuTrendingUp size={18} className="text-primary" />
           </div>
-          <LuTrendingUp size={22} className="text-stext opacity-50" />
+          <p className="text-2xl font-bold text-ptext">91.5%</p>
         </div>
       </div>
 
@@ -137,7 +137,7 @@ const Assignments = () => {
         <button
           onClick={() => setActiveTab("pending")}
           className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${activeTab === "pending"
-              ? "bg-white text-ptext shadow-sm"
+              ? "bg-primary text-white shadow-sm"
               : "text-stext hover:text-ptext"
             }`}
         >
@@ -146,7 +146,7 @@ const Assignments = () => {
         <button
           onClick={() => setActiveTab("completed")}
           className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${activeTab === "completed"
-              ? "bg-white text-ptext shadow-sm"
+              ? "bg-primary text-white shadow-sm"
               : "text-stext hover:text-ptext"
             }`}
         >
@@ -161,38 +161,18 @@ const Assignments = () => {
             key={assignment.id}
             className="bg-white rounded-xl border border-bordercolor p-4 flex items-start gap-4 hover:shadow-sm transition-shadow"
           >
-            {/* Circle indicator */}
-            <div
-              className={`mt-1 shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${assignment.status === "pending"
-                  ? "border-[#CBD5E1]"
-                  : "border-primary bg-primary"
-                }`}
-            >
-              {assignment.status !== "pending" && (
-                <svg
-                  className="w-3 h-3 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={3}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              )}
-            </div>
+            {/* Info icon */}
+            <LuInfo size={20} className="mt-1 shrink-0 text-primary" />
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start justify-between gap-4">
+                {/* Left: title, course, description */}
                 <div className="min-w-0">
                   <h3 className="font-semibold text-ptext leading-snug">
                     {assignment.title}
                   </h3>
-                  <p className="text-sm text-primary font-medium mt-0.5">
+                  <p className="text-sm text-stext font-medium mt-0.5">
                     {assignment.course}
                   </p>
                   <p className="text-sm text-stext mt-1 leading-relaxed">
@@ -200,53 +180,45 @@ const Assignments = () => {
                   </p>
                 </div>
 
-                {/* Badges */}
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {activeTab === "completed" ? (
-                    <>
-                      <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-blue-50 text-blue-600">
-                        submitted
+                {/* Right: badge + meta */}
+                <div className="shrink-0 flex flex-col items-end gap-1.5">
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${assignment.status === "pending"
+                        ? "bg-amber-50 text-amber-600"
+                        : "bg-green-50 text-green-600"
+                      }`}
+                  >
+                    {assignment.status === "pending" ? "Pending" : "Submitted"}
+                  </span>
+
+                  {activeTab === "pending" ? (
+                    <div className="flex flex-col items-end gap-0.5 text-xs text-stext">
+                      <span className="flex items-center gap-1">
+                        <IoCalendarOutline size={12} />
+                        Due {assignment.dueDate}
                       </span>
-                      <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-amber-50 text-amber-600">
-                        Pending
-                      </span>
-                    </>
+                      {assignment.daysLeft > 0 && (
+                        <span className="flex items-center gap-1">
+                          <IoTimeOutline size={12} />
+                          {assignment.daysLeft} days left
+                        </span>
+                      )}
+                    </div>
                   ) : (
-                    <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-amber-50 text-amber-600 capitalize">
-                      {assignment.status}
-                    </span>
+                    <div className="flex flex-col items-end gap-0.5 text-xs text-stext">
+                      <span className="flex items-center gap-1">
+                        <IoCalendarOutline size={12} />
+                        Submitted {assignment.submittedDate}
+                      </span>
+                      {assignment.score && (
+                        <span className="flex items-center gap-1">
+                          <LuStar size={12} />
+                          Score: {assignment.score}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
-              </div>
-
-              {/* Meta info */}
-              <div className="flex items-center gap-4 mt-3 text-xs text-stext">
-                {activeTab === "completed" ? (
-                  <>
-                    <span className="flex items-center gap-1">
-                      <IoCalendarOutline size={13} />
-                      Submitted {assignment.submittedDate}
-                    </span>
-                    {assignment.score && (
-                      <span className="flex items-center gap-1">
-                        <LuStar size={13} />
-                        Score: {assignment.score}
-                      </span>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <span className="flex items-center gap-1">
-                      <IoCalendarOutline size={13} />
-                      Due {assignment.dueDate}
-                    </span>
-                    {assignment.daysLeft > 0 && (
-                      <span className="flex items-center gap-1">
-                        {assignment.daysLeft} days left
-                      </span>
-                    )}
-                  </>
-                )}
               </div>
             </div>
           </div>
