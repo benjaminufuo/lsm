@@ -5,8 +5,8 @@ import {
 } from "react-icons/io5";
 import type { IconType } from "react-icons";
 import TestImage from "../assets/testImg.jpg";
-import LogoIcon from "../assets/icons/logo.svg?react";
-import LearnFlowIcon from "../assets/icons/learnflow.svg?react";
+import LogoIcon from "../assets/icons/logo2.svg?react";
+import LearnFlowIcon from "../assets/icons/learnflow2.svg?react";
 import HamburgerIcon from "../assets/icons/hamburger.svg?react";
 import { useEffect, useState } from "react";
 import { navItems } from "../config/sidebar";
