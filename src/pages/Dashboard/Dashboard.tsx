@@ -44,7 +44,7 @@ const Dashboard = () => {
       imageUrl: course1,
       title: "Advanced React Development",
       instructor: "Dr. Emily Zhang",
-      progress:230,
+      progress:160,
       description: "Next: State Management with Redux",
       percentage: "68%",
     },
@@ -98,7 +98,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="mx-2 md:mr-10">
+    <div className="px-2 md:mr-10">
       <div className="mt-2">
         <h2 className="text-2xl font-bold">Welcome back, Miracle 👋</h2>
         <p className="text-gray-600 mt-2 tracking-wide">
@@ -106,7 +106,7 @@ const Dashboard = () => {
         </p>
       </div>
 
-      <div className="flex flex-col  md:flex-row mt-5 gap-4">
+      <div className="flex flex-col md:flex-row mt-5 gap-4">
         {stats.map((item) => (
           <DashboardCard
             title={item.title}
@@ -117,10 +117,10 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="md:w-11/20 mt-8 flex flex-col gap-4">
+      <div className="flex flex-col md:flex-row gap-4 w-full">
+        <div className="w-full md:w-7/12 mt-8 flex flex-col gap-4">
           <div className="flex flex-row items-center justify-between ">
-            <h2 className="text-2xl font-bold">Active Courses</h2>
+            <h2 className="md:text-2xl font-bold">Active Courses</h2>
             <NavLink
               to="/learnflow/courses"
               className="text-sm text-primary flex flex-row items-center gap-2"
@@ -145,7 +145,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="mt-8 flex-1">
+        <div className="mt-8 w-full md:flex-1">
           <h2 className="text-2xl font-bold mb-4">Upcoming Assignments</h2>
           <div className="bg-white p-2.5 gap-2.5 rounded-2xl">
             <div className="flex flex-col gap-4">
@@ -155,7 +155,7 @@ const Dashboard = () => {
                     key={item.title}
                     className="flex flex-row justify-between items-center"
                   >
-                    <h4 className="text-xl font-semibold mb-1">{item.title}</h4>
+                    <h4 className="text-md font-semibold mb-1">{item.title}</h4>
                     <ClockIcon />
                   </div>
                   <p className="text-[14px] mb-1">{item.course}</p>
@@ -176,7 +176,7 @@ const Dashboard = () => {
                     key={item.title}
                     className="flex flex-row justify-between items-center"
                   >
-                    <h4 className="text-xl font-semibold mb-1">{item.title}</h4>
+                    <h4 className="text-md font-semibold mb-1">{item.title}</h4>
                   </div>
                   <p className="text-[14px] mb-1">{item.course}</p>
                   <p className="text-[#0A2540] font-semibold">

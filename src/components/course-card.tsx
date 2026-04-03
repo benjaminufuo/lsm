@@ -10,8 +10,8 @@ const CousrseCard = ({
   percentage,
 }: CourseCardProps) => {
   return (
-    <div className="flex flex-row bg-white px-2.5 py-4 rounded-2xl gap-6.5">
-      <div className="w-32 h-30 md:w-48 md:h-38">
+    <div className="flex flex-row bg-white px-2.5 py-4 rounded-2xl gap-3 md:gap-6.5">
+      <div className="w-3/12 h-28 md:w-34 md:h-34 shrink-0">
         <img
           src={imageUrl}
           alt={title}
@@ -22,7 +22,7 @@ const CousrseCard = ({
       <div className="flex flex-1 flex-col items-start justify-between h-11/12">
         <div className="flex flex-col w-full">
           <div className="flex flex-row items-center justify-between ">
-            <h2 className="md:text-lg font-semibold ">{title}</h2>
+            <h2 className="text-[12px] md:text-lg font-semibold ">{title}</h2>
             <span className="text-black bg-[#F5F7FAE5] py-1 px-3.5 rounded-2xl font-medium">
               {percentage}
             </span>
@@ -38,7 +38,7 @@ const CousrseCard = ({
           />
         </div>
 
-        <div className=" flex flex-row gap-3">
+        <div className=" flex flex-row md:gap-3">
           <CalenderIcon />
           <span className="text-gray-500 text-xs ml-1">{description}</span>
         </div>
