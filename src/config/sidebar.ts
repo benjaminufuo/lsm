@@ -6,7 +6,11 @@ import { MdOutlineAccountCircle } from "react-icons/md";
 
 export const navItems: NavItemType[] = [
   { name: "Dashboard", path: "/learnflow/dashboard", icon: LuLayoutDashboard },
-  { name: "Courses", path: "/learnflow/courses",  icon: PiBookOpenThin },
-  { name: "Assignments", path: "/learnflow/assignments", icon:IoDocumentTextOutline },
+  { name: "Courses", path: "/learnflow/courses", icon: PiBookOpenThin },
+  {
+    name: "Assignments",
+    path: "/learnflow/assignments",
+    icon: IoDocumentTextOutline,
+  },
   { name: "Profile", path: "/learnflow/profile", icon: MdOutlineAccountCircle },
 ];
