@@ -6,6 +6,7 @@ import detailBtn from "./data/studentCourseBtnList";
 import CourseDetailItem from "./components/studentCourseDetails";
 import topicsData from "./data/topicList";
 import TopicItem from "./components/topicItem";
+import playIcon from "../../assets/play-icon.svg";
 
 const CourseDetail = () => {
   const navigate = useNavigate();
@@ -54,7 +55,6 @@ const CourseDetail = () => {
         <div className="bg-white lg:self-start shrink-0 pt-4 px-4 rounded-xl w-[320px]">
           <div className="">
             <div className="flex items-center justify-between">
-              {" "}
               <span className="text-[#64748B] text-[14px]">
                 Course Progress
               </span>
@@ -69,9 +69,13 @@ const CourseDetail = () => {
               ></div>
             </div>
           </div>
-          <Link className="flex items-center justify-center py-8" to={""}>
-            <span></span>
-            <span className="font-medium text-[14px] text-[#64748B]">
+          <Link
+            className="flex items-center justify-center gap-x-4 py-8 "
+            to={""}
+          >
+            <img className="" src={playIcon} alt="play-icon" />
+
+            <span className="font-medium text-[14px] text-[#64748B] hover:text-[#7B61FF]">
               Continue Learning
             </span>
           </Link>
