@@ -57,7 +57,7 @@ const Input: FC<InputProps> = ({
   icon,
   size = "medium",
 }) => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!disabled && !readOnly && onChange) {
