@@ -44,7 +44,7 @@ const Dashboard = () => {
       imageUrl: course1,
       title: "Advanced React Development",
       instructor: "Dr. Emily Zhang",
-      progress:160,
+      progress: 160,
       description: "Next: State Management with Redux",
       percentage: "68%",
     },
@@ -179,9 +179,7 @@ const Dashboard = () => {
                     <h4 className="text-md font-semibold mb-1">{item.title}</h4>
                   </div>
                   <p className="text-[14px] mb-1">{item.course}</p>
-                  <p className="text-[#0A2540] font-semibold">
-                    {item.dueDate}
-                  </p>
+                  <p className="text-[#0A2540] font-semibold">{item.dueDate}</p>
                 </div>
               ))}
             </div>

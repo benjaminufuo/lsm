@@ -165,7 +165,7 @@ const ProfilePage = (): React.ReactNode => {
                 {/* Edit Avatar Button */}
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 p-1.5 bg-primary text-white rounded-full border-2 border-white hover:bg-primary/80 transition-colors shadow-sm"
+                  className="absolute bottom-0 right-0 p-1.5 bg-gray-400 text-white rounded-full border-2 border-white hover:bg-gray-500 transition-colors shadow-sm"
                   aria-label="Change profile picture"
                 >
                   <FiEdit className="w-4 h-4" />
@@ -245,11 +245,11 @@ const ProfilePage = (): React.ReactNode => {
       </div>
 
       {/* Tabs */}
-      <div className="max-w-6xl mx-auto py-6 h-max">
-        <div className="bg-white rounded-3xl px-2 py-1  inline-flex gap-1">
+      <div className="max-w-6xl mx-auto py-6 px-2 lg:px-0">
+        <div className="bg-white rounded-3xl px-2 py-1 flex sm:inline-flex overflow-x-auto max-w-full gap-1">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`py-2 px-4 font-semibold text-sm rounded-3xl transition duration-200 ${
+            className={`py-2 px-4 font-semibold text-sm rounded-3xl transition duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === "overview"
                 ? "bg-primary text-white"
                 : "text-gray-600 hover:text-gray-900"
@@ -259,7 +259,7 @@ const ProfilePage = (): React.ReactNode => {
           </button>
           <button
             onClick={() => setActiveTab("completed")}
-            className={`py-2 px-4 font-semibold text-sm rounded-3xl transition duration-200 ${
+            className={`py-2 px-4 font-semibold text-sm rounded-3xl transition duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === "completed"
                 ? "bg-primary text-white"
                 : "text-gray-600 hover:text-gray-900"
@@ -269,7 +269,7 @@ const ProfilePage = (): React.ReactNode => {
           </button>
           <button
             onClick={() => setActiveTab("achievements")}
-            className={`py-2 px-4 font-semibold text-sm rounded-3xl transition duration-200 ${
+            className={`py-2 px-4 font-semibold text-sm rounded-3xl transition duration-200 whitespace-nowrap flex-shrink-0 ${
               activeTab === "achievements"
                 ? "bg-primary text-white"
                 : "text-gray-600 hover:text-gray-900"
@@ -360,7 +360,7 @@ const ProfilePage = (): React.ReactNode => {
               {skills.map((skill, index) => (
                 <button
                   key={index}
-                  className="bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-purple-700 px-4 py-2 rounded-full text-sm font-medium transition duration-200"
+                  className="bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-primary px-4 py-2 rounded-full text-sm font-medium transition duration-200"
                 >
                   {skill}
                 </button>

@@ -5,7 +5,6 @@ import LogoIcon from "../assets/icons/logo.svg?react";
 import LearnFlowIcon from "../assets/icons/learnflow.svg?react";
 
 const SideBar = () => {
-
   return (
     <div
       className={cn(
@@ -21,7 +20,8 @@ const SideBar = () => {
         <div className="flex items-center gap-2 border-b-2 border-[#64748B] my-4 py-4">
           <div className="flex flex-row items-center justify-between gap-2 text-white px-2 rounded-2xl shrink-0 overflow-hidden">
             <LogoIcon />
-            <div className="
+            <div
+              className="
               text-xl text-black whitespace-nowrap overflow-hidden
               transition-all duration-200
               
@@ -30,11 +30,11 @@ const SideBar = () => {
               md:group-hover:w-auto md:group-hover:opacity-100
 
               lg:w-auto lg:opacity-100
-            ">
+            "
+            >
               <LearnFlowIcon />
             </div>
           </div>
-
         </div>
         {navItems.map((item) => (
           <SideItems key={item.path} item={item} />
