@@ -66,7 +66,7 @@ const Header = () => {
               lg:w-auto lg:opacity-100
             "
           >
-            <LearnFlowIcon/>
+            <LearnFlowIcon />
           </div>
         </div>
 
