@@ -225,7 +225,7 @@ const ProfilePage = (): React.ReactNode => {
             return (
               <div
                 key={index}
-                className="bg-white w-full h-full rounded-[15px] p-4 sm:p-6 border border-gray-200 hover:border-primary hover:shadow-md transition duration-200"
+                className="bg-white w-full h-full rounded-[15px] p-4 sm:p-6 border border-gray-200 hover:shadow-md transition duration-200"
               >
                 <div className="flex flex-col items-start gap-3">
                   <Icon className="w-2 h-2 sm:w-8 sm:h-8 text-primary" />
