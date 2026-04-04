@@ -91,44 +91,44 @@ const Assignments = () => {
   );
 
   return (
-    <div className="p-2 md:p-6">
+    <div className="min-h-screen pb-10">
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-ptext">Assignments</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-ptext">Assignments</h1>
         <p className="text-stext mt-1 text-sm">
           Track and manage all your course assignments
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl p-4 border border-bordercolor flex flex-col justify-between gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
+        <div className="bg-white rounded-xl p-4 md:p-5 border border-bordercolor flex flex-col justify-between gap-4 min-h-[100px]">
           <div className="flex items-center justify-between">
             <p className="text-xs text-stext">Total Assignments</p>
-            <LuClipboardList size={18} className="text-primary" />
+            <LuClipboardList size={16} className="text-primary shrink-0" />
           </div>
-          <p className="text-2xl font-bold text-ptext">6</p>
+          <p className="text-xl md:text-2xl font-bold text-ptext">6</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bordercolor flex flex-col justify-between gap-4">
+        <div className="bg-white rounded-xl p-4 md:p-5 border border-bordercolor flex flex-col justify-between gap-4 min-h-[100px]">
           <div className="flex items-center justify-between">
             <p className="text-xs text-stext">Pending</p>
-            <LuClock size={18} className="text-primary" />
+            <LuClock size={16} className="text-primary shrink-0" />
           </div>
-          <p className="text-2xl font-bold text-ptext">3</p>
+          <p className="text-xl md:text-2xl font-bold text-ptext">3</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bordercolor flex flex-col justify-between gap-4">
+        <div className="bg-white rounded-xl p-4 md:p-5 border border-bordercolor flex flex-col justify-between gap-4 min-h-[100px]">
           <div className="flex items-center justify-between">
             <p className="text-xs text-stext">Submitted</p>
-            <LuSend size={18} className="text-primary" />
+            <LuSend size={16} className="text-primary shrink-0" />
           </div>
-          <p className="text-2xl font-bold text-ptext">1</p>
+          <p className="text-xl md:text-2xl font-bold text-ptext">1</p>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-bordercolor flex flex-col justify-between gap-4">
+        <div className="bg-white rounded-xl p-4 md:p-5 border border-bordercolor flex flex-col justify-between gap-4 min-h-[100px]">
           <div className="flex items-center justify-between">
             <p className="text-xs text-stext">Average Grade</p>
-            <LuTrendingUp size={18} className="text-primary" />
+            <LuTrendingUp size={16} className="text-primary shrink-0" />
           </div>
-          <p className="text-2xl font-bold text-ptext">91.5%</p>
+          <p className="text-xl md:text-2xl font-bold text-ptext">91.5%</p>
         </div>
       </div>
 
@@ -136,7 +136,7 @@ const Assignments = () => {
       <div className="flex mb-4 bg-gray-100 rounded-full p-1 w-fit">
         <button
           onClick={() => setActiveTab("pending")}
-          className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${activeTab === "pending"
+          className={`px-4 md:px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${activeTab === "pending"
               ? "bg-primary text-white shadow-sm"
               : "text-stext hover:text-ptext"
             }`}
@@ -145,7 +145,7 @@ const Assignments = () => {
         </button>
         <button
           onClick={() => setActiveTab("completed")}
-          className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${activeTab === "completed"
+          className={`px-4 md:px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${activeTab === "completed"
               ? "bg-primary text-white shadow-sm"
               : "text-stext hover:text-ptext"
             }`}
@@ -159,29 +159,29 @@ const Assignments = () => {
         {filteredAssignments.map((assignment) => (
           <div
             key={assignment.id}
-            className="bg-white rounded-xl border border-bordercolor p-4 flex items-start gap-4 hover:shadow-sm transition-shadow"
+            className="bg-white rounded-xl border border-bordercolor p-4 md:p-5 flex items-start gap-3 md:gap-4 hover:shadow-sm transition-shadow"
           >
             {/* Info icon */}
             <LuInfo size={20} className="mt-1 shrink-0 text-primary" />
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
                 {/* Left: title, course, description */}
                 <div className="min-w-0">
-                  <h3 className="font-semibold text-ptext leading-snug">
+                  <h3 className="font-semibold text-ptext leading-snug text-sm md:text-base">
                     {assignment.title}
                   </h3>
-                  <p className="text-sm text-stext font-medium mt-0.5">
+                  <p className="text-xs md:text-sm text-stext font-medium mt-0.5">
                     {assignment.course}
                   </p>
-                  <p className="text-sm text-stext mt-1 leading-relaxed">
+                  <p className="text-xs md:text-sm text-stext mt-1 leading-relaxed">
                     {assignment.description}
                   </p>
                 </div>
 
                 {/* Right: badge + meta */}
-                <div className="shrink-0 flex flex-col items-end gap-1.5">
+                <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1.5 shrink-0">
                   <span
                     className={`text-xs px-2.5 py-1 rounded-full font-medium ${assignment.status === "pending"
                         ? "bg-amber-50 text-amber-600"
@@ -192,7 +192,7 @@ const Assignments = () => {
                   </span>
 
                   {activeTab === "pending" ? (
-                    <div className="flex flex-col items-end gap-0.5 text-xs text-stext">
+                    <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-0.5 text-xs text-stext">
                       <span className="flex items-center gap-1">
                         <IoCalendarOutline size={12} />
                         Due {assignment.dueDate}
@@ -205,7 +205,7 @@ const Assignments = () => {
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-end gap-0.5 text-xs text-stext">
+                    <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-0.5 text-xs text-stext">
                       <span className="flex items-center gap-1">
                         <IoCalendarOutline size={12} />
                         Submitted {assignment.submittedDate}
