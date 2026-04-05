@@ -4,8 +4,10 @@ import SideItems from "./sideitems";
 import LogoIcon from "../assets/icons/logo.svg?react";
 import LearnFlowIcon from "../assets/icons/learnflow.svg?react";
 import { LuLogOut } from "react-icons/lu";
+import { useNavigate } from "react-router";
 
 const SideBar = () => {
+  const navigate = useNavigate();
   return (
     <div
       className={cn(
@@ -44,7 +46,7 @@ const SideBar = () => {
 
       <div className="mx-4 my-8">
         <button
-          onClick={() => navigation.navigate('/signin')}
+          onClick={() => navigate('/signin')}
           className="flex flex-row items-center justify-center gap-2 p-4 font-light tracking-wider text-[#4D4D4DE5] hover:text-primary cursor-pointer rounded-lg transition-colors duration-200 w-full"
         >
           <span className="hidden md:group-hover:inline lg:inline">Logout</span>

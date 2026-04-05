@@ -12,8 +12,10 @@ import { useEffect, useState } from "react";
 import { navItems } from "../config/sidebar";
 import SideItems from "./sideitems";
 import { LuLogOut } from "react-icons/lu";
+import { useNavigate } from "react-router";
 
 const Header = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const SearchIcon = IoSearchOutline as IconType;
@@ -127,7 +129,7 @@ const Header = () => {
               </nav>
 
               <div className=" mx-4 my-8">
-                <button onClick={() => navigation.navigate('/signin')} className="flex flex-row items-center justify-center gap-2 p-4 font-light tracking-wider text-[#4D4D4DE5] hover:text-primary cursor-pointer rounded-lg transition-colors duration-200 w-full">
+                <button onClick={() => navigate('/signin')} className="flex flex-row items-center justify-center gap-2 p-4 font-light tracking-wider text-[#4D4D4DE5] hover:text-primary cursor-pointer rounded-lg transition-colors duration-200 w-full">
                   <p>Logout</p>
                   <LuLogOut size={20} />
                 </button>
