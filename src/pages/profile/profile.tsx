@@ -228,7 +228,7 @@ const ProfilePage = (): React.ReactNode => {
                 className="bg-white w-full h-full rounded-[15px] p-4 sm:p-6 border border-gray-200 hover:shadow-md transition duration-200"
               >
                 <div className="flex flex-col items-start gap-3">
-                  <Icon className="w-2 h-2 sm:w-8 sm:h-8 text-primary" />
+                  <Icon className="w-4 h-4 sm:w-4 sm:h-4 text-primary" />
                   <div>
                     <div className="text-xl sm:text-2xl font-bold text-gray-900">
                       {stat.value}
