@@ -83,7 +83,7 @@ const App = () => {
         },
         {
           path: "admin",
-          element: <PrivateRoute allowableRoles={["admin"]} />,
+         // element: <PrivateRoute allowableRoles={["admin"]} />,
           errorElement: <ErrorPage />,
 
           children: [
