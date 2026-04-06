@@ -11,11 +11,6 @@ export interface CourseCardType {
   courseProgress: string;
 }
 
-export interface CourseDetailButton {
-  name: string;
-  path: string;
-}
-
 export interface TopicList {
   title: string;
   timeDetail: string;

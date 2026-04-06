@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 const Cousrse = () => {
   return (
-    <div className="pb-8">
+    <div className="pb-8 px-2">
       <div className="">
         {" "}
         <h1 className="text-[24px] text-[#0A2540] font-bold mb-2">
