@@ -10,7 +10,7 @@ interface Props {
 const TopicItem = ({ item }: Props) => {
   return (
     <div className={`border-b py-5 pl-2 text-[#64748B] flex gap-3`}>
-      <div className="w-[16px] h-[16px] rounded-full border-[1.9px] border-[#64748B] flex items-center justify-center">
+      <div className="w-[16px] h-[16px] rounded-full border-[1.9px] border-[#64748B] flex items-center justify-center mt-1 lg:mt-0">
         <img src={tickIcon} alt="tick-icon" />
       </div>
       <div className="pt-0">

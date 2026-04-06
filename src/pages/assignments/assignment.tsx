@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { IoCalendarOutline, IoTimeOutline } from "react-icons/io5";
-import { LuClipboardList, LuClock, LuSend, LuTrendingUp, LuStar, LuInfo } from "react-icons/lu";
+import {
+  LuClipboardList,
+  LuClock,
+  LuSend,
+  LuTrendingUp,
+  LuStar,
+  LuInfo,
+} from "react-icons/lu";
 
 interface Assignment {
   id: number;
@@ -19,7 +26,8 @@ const assignmentsData: Assignment[] = [
     id: 1,
     title: "React Component Architecture",
     course: "Advanced React Development",
-    description: "Design and implement a scalable component architecture for a complex application.",
+    description:
+      "Design and implement a scalable component architecture for a complex application.",
     status: "pending",
     dueDate: "Mar 22, 2026",
     daysLeft: 3,
@@ -28,7 +36,8 @@ const assignmentsData: Assignment[] = [
     id: 2,
     title: "User Research Report",
     course: "UI/UX Design Fundamentals",
-    description: "Conduct user research and create a comprehensive report with insights.",
+    description:
+      "Conduct user research and create a comprehensive report with insights.",
     status: "pending",
     dueDate: "Mar 25, 2026",
     daysLeft: 6,
@@ -37,7 +46,8 @@ const assignmentsData: Assignment[] = [
     id: 3,
     title: "State Management Implementation",
     course: "Advanced React Development",
-    description: "Implement Redux for state management in a medium-sized application.",
+    description:
+      "Implement Redux for state management in a medium-sized application.",
     status: "pending",
     dueDate: "Mar 28, 2026",
     daysLeft: 9,
@@ -77,24 +87,30 @@ const assignmentsData: Assignment[] = [
 ];
 
 const Assignments = () => {
-  const [activeTab, setActiveTab] = useState<"pending" | "completed">("pending");
+  const [activeTab, setActiveTab] = useState<"pending" | "completed">(
+    "pending",
+  );
 
-  const pendingCount = assignmentsData.filter((a) => a.status === "pending").length;
+  const pendingCount = assignmentsData.filter(
+    (a) => a.status === "pending",
+  ).length;
   const completedCount = assignmentsData.filter(
-    (a) => a.status === "completed" || a.status === "submitted"
+    (a) => a.status === "completed" || a.status === "submitted",
   ).length;
 
   const filteredAssignments = assignmentsData.filter((a) =>
     activeTab === "pending"
       ? a.status === "pending"
-      : a.status === "completed" || a.status === "submitted"
+      : a.status === "completed" || a.status === "submitted",
   );
 
   return (
     <div className="min-h-screen pb-10">
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-ptext">Assignments</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-ptext">
+          Assignments
+        </h1>
         <p className="text-stext mt-1 text-sm">
           Track and manage all your course assignments
         </p>
@@ -136,19 +152,21 @@ const Assignments = () => {
       <div className="flex mb-4 bg-gray-100 rounded-full p-1 w-fit">
         <button
           onClick={() => setActiveTab("pending")}
-          className={`px-4 md:px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${activeTab === "pending"
+          className={`px-4 md:px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${
+            activeTab === "pending"
               ? "bg-primary text-white shadow-sm"
               : "text-stext hover:text-ptext"
-            }`}
+          }`}
         >
           Pending ({pendingCount})
         </button>
         <button
           onClick={() => setActiveTab("completed")}
-          className={`px-4 md:px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${activeTab === "completed"
+          className={`px-4 md:px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${
+            activeTab === "completed"
               ? "bg-primary text-white shadow-sm"
               : "text-stext hover:text-ptext"
-            }`}
+          }`}
         >
           Completed ({completedCount})
         </button>
@@ -183,10 +201,11 @@ const Assignments = () => {
                 {/* Right: badge + meta */}
                 <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1.5 shrink-0">
                   <span
-                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${assignment.status === "pending"
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                      assignment.status === "pending"
                         ? "bg-amber-50 text-amber-600"
                         : "bg-green-50 text-green-600"
-                      }`}
+                    }`}
                   >
                     {assignment.status === "pending" ? "Pending" : "Submitted"}
                   </span>
