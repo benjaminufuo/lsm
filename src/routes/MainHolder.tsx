@@ -8,13 +8,13 @@ const MainHolder = () => {
       <SideBar />
       <div
         className="
-          flex-1 flex flex-col
+          flex-1 flex flex-col min-w-0
           md:ml-16
           lg:ml-52  
         "
       >
         <Header />
-        <main className="flex-1 overflow-y-auto p-3">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-3">
           <Outlet />
         </main>
       </div>
