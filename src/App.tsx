@@ -19,7 +19,6 @@ import AdminAssignmentsPage from "./modules/admin/pages/AdminAssignmentsPage.tsx
 import AdminUsersPage from "./modules/admin/pages/AdminUsersPage";
 
 import CourseDetail from "./pages/courses/courseDetail";
-import Overview from "./pages/courses/overview";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -69,7 +68,6 @@ const App = () => {
             {
               path: "courses/:courseId",
               element: <CourseDetail />,
-              children: [{ path: "overview", element: <Overview /> }],
             },
             {
               path: "assignments",
@@ -83,7 +81,7 @@ const App = () => {
         },
         {
           path: "admin",
-         element: <PrivateRoute allowableRoles={["admin"]} />,
+          element: <PrivateRoute allowableRoles={["admin"]} />,
           errorElement: <ErrorPage />,
 
           children: [
