@@ -246,7 +246,7 @@ const ProfilePage = (): React.ReactNode => {
 
       {/* Tabs */}
       <div className="max-w-6xl mx-auto py-6 px-2 lg:px-0">
-        <div className="bg-white rounded-3xl px-2 py-1 flex sm:inline-flex overflow-x-auto max-w-full gap-1">
+        <div className="bg-white rounded-3xl px-2 py-1 flex sm:inline-flex overflow-x-auto max-w-full gap-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <button
             onClick={() => setActiveTab("overview")}
             className={`py-2 px-4 font-semibold text-sm rounded-3xl transition duration-200 whitespace-nowrap flex-shrink-0 ${
