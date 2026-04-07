@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LuCheck } from "react-icons/lu";
 import { PiGift } from "react-icons/pi";
 import { MdOutlineArrowBack } from "react-icons/md";
