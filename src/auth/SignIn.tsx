@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import type { FC } from "react";
+import { useState } from "react";
 import { LuCheck } from "react-icons/lu";
 import { MdOutlineArrowBack, MdOutlineMail } from "react-icons/md";
 import { IoLockClosedOutline } from "react-icons/io5";
@@ -92,10 +92,8 @@ const SignIn: FC = () => {
         },
       );
 
-      // Log to see the exact structure of your backend response!
       console.log("API Response:", response.data);
 
-      // Extract token and user details from the 'data' object
       const token = response.data?.data?.token || response.data?.token;
       const user = response.data?.data || response.data?.user;
 
