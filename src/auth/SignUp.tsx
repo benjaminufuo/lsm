@@ -12,6 +12,7 @@ import Button from "../shared/Button/Index";
 import Input from "../shared/Input/Index";
 import leftimg from "../assets/signupleftbg.jpg";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const SignUp = () => {
   const location = useLocation();
@@ -82,18 +83,25 @@ const SignUp = () => {
 
     setLoading(true);
     try {
-      // --- API Call Simulation ---
+      // Prepare the data to send to your backend
       const payload = {
-        ...formData,
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
         role: isStudent ? "student" : "admin",
       };
-      console.log("Submitting:", payload);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      toast.success("Account created successfully! Please log in.");
-      setTimeout(() => {
-        navigate("/signin");
-      }, 1500);
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}auth/register`,
+        payload,
+      );
+      if (response.status === 201) {
+        toast.success("Account created successfully! Please log in.");
+        console.log("account created");
+        setTimeout(() => {
+          navigate("/signin");
+        }, 1500);
+      }
     } catch (error) {
       toast.error("An error occurred during signup. Please try again.");
     } finally {
@@ -331,6 +339,7 @@ const SignUp = () => {
             icon={<FcGoogle size={20} />}
             className="rounded-[15px]"
             style={{ borderColor: "#d1d5db" }}
+            disabled={loading}
           >
             Google
           </Button>
