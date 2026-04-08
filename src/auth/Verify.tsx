@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
 import { toast } from "react-toastify";
-import axios from "axios";
 import Button from "../shared/Button/Index";
 
 const Verify = () => {
