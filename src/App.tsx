@@ -19,7 +19,7 @@ import AdminAssignmentsPage from "./modules/admin/pages/AdminAssignmentsPage.tsx
 import AdminUsersPage from "./modules/admin/pages/AdminUsersPage";
 
 import CourseDetail from "./pages/courses/courseDetail";
-import Overview from "./pages/courses/overview";
+import Verify from "./auth/Verify.tsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -51,6 +51,7 @@ const App = () => {
       path: "/create-password",
       element: <CreatePassword />,
     },
+    { path: "/verify", element: <Verify /> },
     {
       path: "/learnflow",
       element: <PrivateRoute />,
@@ -69,7 +70,6 @@ const App = () => {
             {
               path: "courses/:courseId",
               element: <CourseDetail />,
-              children: [{ path: "overview", element: <Overview /> }],
             },
             {
               path: "assignments",

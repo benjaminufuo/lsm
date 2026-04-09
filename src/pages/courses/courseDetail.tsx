@@ -1,23 +1,28 @@
-import { useParams, useNavigate, Link, Outlet } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { coursesMock } from "./data/coursesMock";
 import { MdOutlineArrowBack } from "react-icons/md";
 import timeIcon from "../../assets/clock-icon-svg.svg";
-import detailBtn from "./data/studentCourseBtnList";
-import CourseDetailItem from "./components/studentCourseDetails";
+import Overview from "./overview";
+import Resources from "./resources";
+import MyNotes from "./my-notes";
 import topicsData from "./data/topicList";
 import TopicItem from "./components/topicItem";
 import playIcon from "../../assets/play-icon.svg";
+import { useState } from "react";
 
 const CourseDetail = () => {
   const navigate = useNavigate();
   const { courseId } = useParams();
   const course = coursesMock.find((course) => course.id === courseId);
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "resources" | "mynotes"
+  >("overview");
 
   if (!course) {
     return <div></div>;
   }
   return (
-    <div className="text-[#0A2540] lg:w-[96%]">
+    <div className="text-[#0A2540] lg:w-[96%] px-2">
       {" "}
       <button
         onClick={() => navigate(-1)}
@@ -52,7 +57,7 @@ const CourseDetail = () => {
         </div>
 
         {/* Progress information */}
-        <div className="bg-white lg:self-start shrink-0 pt-4 px-4 rounded-xl w-[320px]">
+        <div className="bg-white lg:self-start shrink-0 pt-4 px-4 rounded-xl lg:w-[320px]">
           <div className="">
             <div className="flex items-center justify-between">
               <span className="text-[#64748B] text-[14px]">
@@ -83,12 +88,49 @@ const CourseDetail = () => {
       </div>
       <div className="mt-10 lg:flex gap-6">
         <section className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-4 bg-white px-1 rounded-xl py-1">
-            {detailBtn.map((button) => (
-              <CourseDetailItem btn={button} />
-            ))}
+          <div className="flex items-center justify-between mb-4 bg-white px-1 rounded-xl py-1 w-full">
+            <button
+              className={`
+          transition-all duration-200 flex items-center justify-center px-4 lg:px-16 py-1 
+          ${
+            activeTab === "overview"
+              ? "text-white bg-primary rounded-2xl"
+              : "text-[#64748B] hover:bg-primary/20 rounded-2xl"
+          }`}
+              onClick={() => setActiveTab("overview")}
+            >
+              Overview
+            </button>
+            <button
+              className={`
+          transition-all duration-200 flex items-center justify-center px-4 lg:px-16 py-1 
+          ${
+            activeTab === "resources"
+              ? "text-white bg-primary rounded-2xl"
+              : "text-[#64748B] hover:bg-primary/20 rounded-2xl"
+          }`}
+              onClick={() => setActiveTab("resources")}
+            >
+              Resources
+            </button>
+            <button
+              className={`
+          transition-all duration-200 flex items-center justify-center px-4 lg:px-16 py-1 
+          ${
+            activeTab === "mynotes"
+              ? "text-white bg-primary rounded-2xl"
+              : "text-[#64748B] hover:bg-primary/20 rounded-2xl"
+          }`}
+              onClick={() => setActiveTab("mynotes")}
+            >
+              My Notes
+            </button>
           </div>
-          <Outlet />
+          <div>
+            {activeTab === "overview" && <Overview />}
+            {activeTab === "resources" && <Resources />}
+            {activeTab === "mynotes" && <MyNotes />}
+          </div>
 
           <div className="text-[#0A2540] bg-white mt-6 p-4">
             <h3 className="font-bold text-[20px]">About the instructor</h3>
@@ -109,7 +151,7 @@ const CourseDetail = () => {
             </div>
           </div>
         </section>
-        <section className="pt-2 bg-white shrink-0 rounded-xl px-2 w-[320px]">
+        <section className="pt-2 bg-white shrink-0 rounded-xl px-2 lg:w-[320px]">
           <div className="border-b pl-5 py-4 text-[#0A2540]">
             <span className="font-bold text-[20px] ">Course Content</span>
             <p className="text-[14px]">

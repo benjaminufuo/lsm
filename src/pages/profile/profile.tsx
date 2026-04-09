@@ -1,216 +1,148 @@
-import { useState } from "react"
-import Button from "../../shared/Button/Index"
-import Input from "../../shared/Input/Index"
-import { RiBookLine, RiTimeLine, RiCalendarLine, RiMedalLine } from "react-icons/ri"
-import { HiOutlineMail } from "react-icons/hi"
-import { MdOutlineLocationOn, MdOutlineDateRange } from "react-icons/md"
-import { FiStar, FiZap, FiTarget, FiSearch } from "react-icons/fi"
+"use client";
 
-interface Stat {
-  label: string
-  value: string
-  subtitle?: string
-  icon: JSX.Element
-}
+import { useState, useRef } from "react";
+import Button from "../../shared/Button/Index";
+import Input from "../../shared/Input/Index";
+import { HiOutlineMail } from "react-icons/hi";
+import { HiMapPin } from "react-icons/hi2";
+import { IoBookOutline } from "react-icons/io5";
+import { GoClock } from "react-icons/go";
+import { MdOutlineCalendarToday } from "react-icons/md";
+import { LuAward, LuTrophy } from "react-icons/lu";
+import { RxLightningBolt } from "react-icons/rx";
+import { BiBullseye } from "react-icons/bi";
+import { GrLocation } from "react-icons/gr";
+import { FiEdit } from "react-icons/fi";
 
-interface ProgressItem {
-  course: string
-  percent: number
-  color: string
+interface StatCard {
+  value: string | number;
+  label: string;
+  subtext?: string;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 interface Achievement {
-  title: string
-  desc: string
-  icon: JSX.Element
-  iconColor: string
+  id: number;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
 }
 
-interface ProfileData {
-  name: string
-  role: string
-  email: string
-  location: string
-  joinedDate: string
-  stats: Stat[]
-  progress: ProgressItem[]
-  achievements: Achievement[]
-  skills: string[]
+interface SkillProgress {
+  name: string;
+  percentage: number;
 }
 
-const profileData: ProfileData = {
-  name: "Nimmi Mike",
-  role: "Student • Full Stack Developer",
-  email: "sarahchen@gmail.com",
-  location: "Lagos, Nigeria",
-  joinedDate: "Joined January 2025",
-  stats: [
-    { label: "Courses Completed", value: "8", icon: <RiBookLine className="text-[#7b61ff] text-lg" /> },
-    { label: "Total Days Learn", value: "127", subtitle: "+12 this week", icon: <RiTimeLine className="text-[#7b61ff] text-lg" /> },
-    { label: "Personal Best", value: "15 days", icon: <RiCalendarLine className="text-[#7b61ff] text-lg" /> },
-    { label: "Average Grade", value: "91.5%", icon: <RiMedalLine className="text-[#7b61ff] text-lg" /> },
-  ],
-  progress: [
-    { course: "React Development", percent: 68, color: "#F59E0B" },
-    { course: "UI/UX Design", percent: 45, color: "#7b61ff" },
-    { course: "Data Science", percent: 82, color: "#10B981" },
-  ],
-  achievements: [
-    { title: "Top Performer", desc: "Achieved top grades in 5 courses", icon: <FiStar size={16} />, iconColor: "#F59E0B" },
-    { title: "Fast Learner", desc: "Completed 3 courses in one month", icon: <FiZap size={16} />, iconColor: "#3B82F6" },
-    { title: "Goal Crusher", desc: "15-day learning streak", icon: <FiTarget size={16} />, iconColor: "#7b61ff" },
-  ],
-  skills: ["React", "JavaScript", "TypeScript", "Python", "UI/UX Design", "Data Analysis", "HTML/CSS", "Node.js", "Figma", "Git"],
-}
+type TabType = "overview" | "completed" | "achievements";
 
-const Profile = () => {
-  const [activeTab, setActiveTab] = useState<string>("Overview")
-  const tabs: string[] = ["Overview", "Completed Courses", "Achievements"]
+const ProfilePage = (): React.ReactNode => {
+  const [activeTab, setActiveTab] = useState<TabType>("overview");
+
+  // Modal & Form State
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "Nimmi Mike",
+    email: "sarah@digitalgmail.com",
+    location: "Lagos, Nigeria",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = () => {
+    // Add API call logic here to save profile changes
+    setIsModalOpen(false);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setProfileImage(imageUrl);
+    }
+  };
+
+  const statCards: StatCard[] = [
+    {
+      value: 8,
+      label: "Courses Completed",
+      icon: IoBookOutline,
+    },
+    {
+      value: "127",
+      label: "+12 this week",
+      icon: GoClock,
+    },
+    {
+      value: "15 days",
+      label: "Personal best",
+      icon: MdOutlineCalendarToday,
+    },
+    {
+      value: "9.1.5%",
+      label: "Average Grade",
+      icon: LuAward,
+    },
+  ];
+
+  const skillProgress: Array<SkillProgress & { color: string }> = [
+    {
+      name: "React Development",
+      percentage: 68,
+      color: "bg-[#FFE357]",
+    },
+    {
+      name: "UI/UX Design",
+      percentage: 45,
+      color: "bg-primary",
+    },
+    {
+      name: "Data Science",
+      percentage: 82,
+      color: "bg-[#14AE28F2]",
+    },
+  ];
+
+  const achievements: Achievement[] = [
+    {
+      id: 1,
+      icon: LuTrophy,
+      title: "Top Performer",
+      description: "Achieved top 10 of class in 5 courses",
+    },
+    {
+      id: 2,
+      icon: RxLightningBolt,
+      title: "Fast Learner",
+      description: "Completed 3 courses in one month",
+    },
+    {
+      id: 3,
+      icon: BiBullseye,
+      title: "Goal Crusher",
+      description: "15-day learning streak",
+    },
+  ];
+
+  const skills = [
+    "React",
+    "JavaScript",
+    "TypeScript",
+    "Python",
+    "UI/UX Design",
+    "Data Analysis",
+    "HTML/CSS",
+    "Node.js",
+    "Figma",
+    "Git",
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-
-      {/* Profile Header */}
-      <div className="bg-white rounded-xl p-4 md:p-6 mb-6">
-        <div className="flex flex-col md:flex-row items-start justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-300 overflow-hidden flex-shrink-0">
-              <img
-                src="https://i.pravatar.cc/80"
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h1 className="text-lg md:text-xl font-bold text-[#0a2540]">{profileData.name}</h1>
-              <p className="text-sm text-[#6b7a8f]">{profileData.role}</p>
-              <div className="flex flex-wrap gap-2 md:gap-4 text-xs text-[#6b7a8f] mt-1">
-                <span className="flex items-center gap-1">
-                  <HiOutlineMail /> {profileData.email}
-                </span>
-                <span className="flex items-center gap-1">
-                  <MdOutlineLocationOn /> {profileData.location}
-                </span>
-                <span className="flex items-center gap-1">
-                  <MdOutlineDateRange /> {profileData.joinedDate}
-                </span>
-              </div>
-            </div>
-          </div>
-          <Button variant="primary" size="small">
-            Edit Profile
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {profileData.stats.map((stat: Stat) => (
-          <div key={stat.label} className="bg-white rounded-xl p-4 border border-[#e2e8f0]">
-            {stat.icon}
-            <p className="text-xl md:text-2xl font-bold mt-1 text-[#0a2540]">{stat.value}</p>
-            {stat.subtitle && (
-              <p className="text-xs text-green-500">{stat.subtitle}</p>
-            )}
-            <p className="text-xs text-[#6b7a8f]">{stat.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-2 md:gap-4 mb-6 flex-wrap">
-        {tabs.map((tab: string) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`text-sm px-4 py-1.5 rounded-full transition-colors ${
-              activeTab === tab
-                ? "bg-[#7b61ff] text-white"
-                : "text-[#6b7a8f] hover:text-[#7b61ff]"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === "Overview" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          {/* Learning Progress */}
-          <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-            <h2 className="font-semibold mb-4 text-[#0a2540]">Learning Progress</h2>
-            {profileData.progress.map((item: ProgressItem) => (
-              <div key={item.course} className="mb-4">
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-[#0a2540]">{item.course}</span>
-                  <span className="text-[#6b7a8f]">{item.percent}%</span>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full"
-                    style={{ width: `${item.percent}%`, backgroundColor: item.color }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Recent Achievements */}
-          <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-            <h2 className="font-semibold mb-4 text-[#0a2540]">Recent Achievements</h2>
-            {profileData.achievements.map((item: Achievement) => (
-              <div key={item.title} className="flex items-center gap-3 mb-4">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: `${item.iconColor}20`, color: item.iconColor }}
-                >
-                  {item.icon}
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#0a2540]">{item.title}</p>
-                  <p className="text-xs text-[#6b7a8f]">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-      )}
-
-      {activeTab === "Completed Courses" && (
-        <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-          <div className="mb-4">
-            <Input
-              placeholder="Search completed courses..."
-              icon={<FiSearch />}
-              size="medium"
-            />
-          </div>
-          <p className="text-[#6b7a8f] text-sm">Completed courses will be loaded from the API</p>
-        </div>
-      )}
-
-      {activeTab === "Achievements" && (
-        <div className="bg-white rounded-xl p-6 border border-[#e2e8f0]">
-          <p className="text-[#6b7a8f] text-sm">Achievements will be loaded from the API</p>
-        </div>
-      )}
-
-      {/* Skills */}
-      <div className="bg-white rounded-xl p-6 mt-6 border border-[#e2e8f0]">
-        <h2 className="font-semibold mb-4 text-[#0a2540]">Skills & Expertise</h2>
-        <div className="flex flex-wrap gap-4">
-          {profileData.skills.map((skill: string) => (
-            <span key={skill} className="text-sm text-[#6b7a8f]">
-              {skill}
-            </span>
-          ))}
-        </div>
-      </div>
-
-    </div>
+    <div>profile</div>
   )
 }
 

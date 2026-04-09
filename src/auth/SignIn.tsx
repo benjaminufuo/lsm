@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import type { FC } from "react";
+import { useState } from "react";
 import { LuCheck } from "react-icons/lu";
 import { MdOutlineArrowBack, MdOutlineMail } from "react-icons/md";
 import { IoLockClosedOutline } from "react-icons/io5";
@@ -11,6 +11,7 @@ import leftimg from "../assets/signinrightbg.jpg";
 import { useDispatch } from "react-redux";
 import { setUserToken, setUserInfo } from "../global/slice";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const SignIn: FC = () => {
   const navigate = useNavigate();
@@ -83,48 +84,45 @@ const SignIn: FC = () => {
 
     try {
       // --- API Call Simulation ---
-      console.log("Attempting to log in with:", formData);
-      const response = await new Promise<{
-        token: string;
-        user: { name: string; email: string; role: string };
-      }>((resolve, reject) => {
-        setTimeout(() => {
-          // Simulate a successful login for demonstration
-          if (formData.email.includes("@") && formData.password.length >= 6) {
-            // Mock a role based on the email address for testing
-            const simulatedRole = formData.email.includes("admin")
-              ? "admin"
-              : "student";
-            resolve({
-              token: "a-real-jwt-token-from-your-api",
-              user: {
-                name: "Test User",
-                email: formData.email,
-                role: simulatedRole,
-              },
-            });
-          } else {
-            // Simulate a failed login
-            reject(new Error("Invalid credentials. Please try again."));
-          }
-        }, 1500); // 1.5-second delay to simulate network request
-      });
-      // --- End of API Call Simulation ---
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}auth/login`,
+        {
+          email: formData.email,
+          password: formData.password,
+        },
+      );
 
-      dispatch(setUserToken(response.token));
-      dispatch(setUserInfo(response.user));
+      console.log("API Response:", response.data);
 
-      toast.success("Logged in successfully!");
-      if (response.user.role === "admin") {
+      const token = response.data?.data?.token || response.data?.token;
+      const user = response.data?.data || response.data?.user;
+
+      if (!token) {
+        toast.error(
+          "Login successful, but no token was found in the response!",
+        );
+        console.error(
+          "Missing token. Check your API response structure:",
+          response.data,
+        );
+        return; // Stop here so PrivateRoute doesn't instantly kick you out
+      }
+
+      dispatch(setUserToken(token));
+      dispatch(setUserInfo(user));
+
+      toast.success(response.data?.message || "Logged in successfully!");
+      if (user?.role?.toLowerCase() === "admin") {
         navigate("/learnflow/admin");
       } else {
         navigate("/learnflow/dashboard");
       }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "An unknown error occurred.";
-      toast.error(errorMessage);
-      console.error("Login failed:", error);
+    } catch (error: any) {
+      if (error.response?.data?.message === "Invalid credentials") {
+        toast.error("Invalid email or password. Please try again.");
+      } else {
+        toast.error("An error occurred. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }
