@@ -25,7 +25,6 @@ interface PasswordRequirements {
 }
 
 export default function CreatePassword({
-  onPasswordReset,
   onBackToLogin,
 }: CreatePasswordProps): React.ReactNode {
   const navigate = useNavigate();
