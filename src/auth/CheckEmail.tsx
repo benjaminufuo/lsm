@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineMail, MdOutlineArrowBack } from "react-icons/md";
 import Button from "../shared/Button/Index";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const CheckEmail: React.FC = () => {
   const navigate = useNavigate();
@@ -13,22 +15,57 @@ const CheckEmail: React.FC = () => {
   const [resendClicked, setResendClicked] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleResendEmail = async (): Promise<void> => {
+  const handleResendEmail = async () => {
+    // Prevent calling the API if the email is the fallback string or invalid
+    if (email === "your email address" || !email.includes("@")) {
+      toast.error("Invalid email address. Please request a new reset link.");
+      return;
+    }
+
     setLoading(true);
 
     // --- API Call Simulation ---
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    setLoading(false);
-    setResendClicked(true);
-
-    setTimeout(() => {
-      setResendClicked(false);
-    }, 3000);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}auth/resend-reset-password`,
+        { email },
+      );
+      setLoading(false);
+      setResendClicked(true);
+      toast.success(
+        response?.data?.message || "Verification email resent successfully!",
+      );
+    } catch (error: any) {
+      setLoading(false);
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to resend verification email.",
+      );
+    }
   };
 
   const handleOpenEmailApp = (): void => {
-    // Open email app - this would vary by device
+    if (email && email.includes("@")) {
+      const domain = email.split("@")[1].toLowerCase();
+      if (domain === "gmail.com") {
+        window.open("https://mail.google.com", "_blank");
+        return;
+      } else if (domain === "yahoo.com" || domain === "ymail.com") {
+        window.open("https://mail.yahoo.com", "_blank");
+        return;
+      } else if (domain === "outlook.com" || domain === "hotmail.com") {
+        window.open("https://outlook.live.com", "_blank");
+        return;
+      } else if (domain === "icloud.com") {
+        window.open("https://mail.me.com", "_blank");
+        return;
+      } else if (domain === "mailinator.com") {
+        window.open("https://www.mailinator.com", "_blank");
+        return;
+      }
+    }
+
+    // Fallback to default system mail client if webmail isn't recognized
     window.location.href = "mailto:";
   };
 
