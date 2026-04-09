@@ -1,5 +1,5 @@
 import { useState, type FormEvent, type ChangeEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { MdCheckCircle, MdOutlineArrowBack } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
 import { IoLockClosedOutline } from "react-icons/io5";
@@ -7,6 +7,7 @@ import Button from "../shared/Button/Index";
 import Input from "../shared/Input/Index";
 import { toast } from "react-toastify";
 import PasswordSuccessModal from "../components/ResetPasswordSuccessModal";
+import axios from "axios";
 
 interface CreatePasswordFormData {
   newPassword: string;
@@ -28,6 +29,8 @@ export default function CreatePassword({
   onBackToLogin,
 }: CreatePasswordProps): React.ReactNode {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -57,34 +60,32 @@ export default function CreatePassword({
     setConfirmPassword(e.target.value);
   };
 
-  const handleResetPassword = async (
-    e: FormEvent<HTMLFormElement>,
-  ): Promise<void> => {
+  const handleResetPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!isFormValid) return;
+
+    if (!token) {
+      toast.error("Invalid or missing reset token. Please request a new link.");
+      return;
+    }
+
     setLoading(true);
 
-    const formData: CreatePasswordFormData = {
-      newPassword,
-      confirmPassword,
-    };
-
     try {
-      // --- API Call Simulation ---
-      console.log("Password reset:", formData);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      if (onPasswordReset) {
-        onPasswordReset(formData);
-      }
-
-      // Reset form & Show Modal
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}auth/reset-password/${token}`,
+        { password: newPassword },
+      );
+      toast.success(response.data.message);
       setNewPassword("");
       setConfirmPassword("");
       setShowSuccessModal(true);
-    } catch (error) {
-      toast.error("Failed to reset password. Please try again.");
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to reset password. Please try again.",
+      );
     } finally {
       setLoading(false);
     }

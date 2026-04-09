@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { MdOutlineMail, MdOutlineArrowBack } from "react-icons/md";
 import Button from "../shared/Button/Index";
 import Input from "../shared/Input/Index";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export const ForgotPassword = (): React.ReactNode => {
   const navigate = useNavigate();
@@ -14,23 +16,30 @@ export const ForgotPassword = (): React.ReactNode => {
     setEmail(e.target.value);
   };
 
-  const handleResetPassword = async (
-    e: FormEvent<HTMLFormElement>,
-  ): Promise<void> => {
+  const handleResetPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email.trim()) return;
 
     setLoading(true);
 
-    // --- API Call Simulation ---
-    console.log("Reset password requested:", { email });
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}auth/forgot-password`,
+        { email },
+      );
 
-    setLoading(false);
-    setSubmitted(true);
-
-    // Navigate to check email page
-    navigate("/check-email", { state: { email } });
+      toast.success(response?.data?.message || "Password reset link sent!");
+      setSubmitted(true);
+      navigate("/check-email", { state: { email } });
+    } catch (error: any) {
+      console.log(error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to send reset link. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
