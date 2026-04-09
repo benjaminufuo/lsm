@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineMail, MdOutlineArrowBack } from "react-icons/md";
 import Button from "../shared/Button/Index";
