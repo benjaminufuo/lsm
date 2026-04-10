@@ -22,9 +22,9 @@ const Verify = () => {
       }
 
       try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}auth/verify-email`,
-          { token },
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}auth/verify-email`,
+          { params: { token } },
         );
         setIsVerified(true);
         toast.success(
