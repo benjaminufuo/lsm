@@ -56,7 +56,9 @@ const ProfilePage = (): React.ReactNode => {
   const [saving, setSaving] = useState(false);
   const [joinedDate, setJoinedDate] = useState<string>("--");
   const [skills, setSkills] = useState<string[]>([]);
-  const [learningProgress, setLearningProgress] = useState<LearningProgress[]>([]);
+  const [learningProgress, setLearningProgress] = useState<LearningProgress[]>(
+    [],
+  );
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [stats, setStats] = useState({
     coursesCompleted: 0,
@@ -85,7 +87,7 @@ const ProfilePage = (): React.ReactNode => {
             headers: {
               Authorization: `Bearer ${userToken}`,
             },
-          }
+          },
         );
         const data = response.data?.data || response.data;
         if (data) {
@@ -105,10 +107,12 @@ const ProfilePage = (): React.ReactNode => {
           // Set joined date
           if (data.joinedAt) {
             const date = new Date(data.joinedAt);
-            setJoinedDate(date.toLocaleDateString("en-US", {
-              month: "long",
-              year: "numeric",
-            }));
+            setJoinedDate(
+              date.toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric",
+              }),
+            );
           }
 
           // Set skills
@@ -157,24 +161,31 @@ const ProfilePage = (): React.ReactNode => {
     if (!userToken) return;
     setSaving(true);
     try {
-      const form = new FormData();
-      form.append("fullName", formData.name);
-      form.append("location", formData.location);
-      form.append("bio", formData.bio || "");
+      let payload: any;
+      let headers: any = { Authorization: `Bearer ${userToken}` };
 
       if (fileInputRef.current?.files?.[0]) {
-        form.append("avatar", fileInputRef.current.files[0]);
+        payload = new FormData();
+        payload.append("fullName", formData.name);
+        payload.append("email", formData.email);
+        payload.append("location", formData.location);
+        payload.append("bio", formData.bio || "");
+        payload.append("avatar", fileInputRef.current.files[0]);
+        headers["Content-Type"] = "multipart/form-data";
+      } else {
+        payload = {
+          fullName: formData.name,
+          email: formData.email,
+          location: formData.location,
+          bio: formData.bio || "",
+        };
+        headers["Content-Type"] = "application/json";
       }
 
       const response = await axios.put(
         `${import.meta.env.VITE_BASE_URL}users/profile`,
-        form,
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        payload,
+        { headers },
       );
       const data = response.data?.data || response.data;
       dispatch(setUserInfo(data));
@@ -201,13 +212,26 @@ const ProfilePage = (): React.ReactNode => {
   };
 
   const statCards: StatCard[] = [
-    { value: stats.coursesCompleted, label: "Courses Completed", icon: IoBookOutline },
+    {
+      value: stats.coursesCompleted,
+      label: "Courses Completed",
+      icon: IoBookOutline,
+    },
     { value: stats.hoursLearned, label: "Hours Learned", icon: GoClock },
-    { value: stats.personalBest, label: "Personal Best", icon: MdOutlineCalendarToday },
+    {
+      value: stats.personalBest,
+      label: "Personal Best",
+      icon: MdOutlineCalendarToday,
+    },
     { value: stats.averageGrade, label: "Average Grade", icon: LuAward },
   ];
 
-  const progressColors = ["bg-[#FFE357]", "bg-primary", "bg-green-500", "bg-blue-500"];
+  const progressColors = [
+    "bg-[#FFE357]",
+    "bg-primary",
+    "bg-green-500",
+    "bg-blue-500",
+  ];
 
   if (loading) {
     return (
@@ -227,7 +251,11 @@ const ProfilePage = (): React.ReactNode => {
               <div className="flex-shrink-0 relative w-[100px] h-[100px]">
                 <div className="h-full w-full rounded-full bg-gradient-to-br from-primary to-pink-400 flex items-center justify-center text-white text-3xl font-bold border-2 border-purple-300 overflow-hidden shadow-sm">
                   {profileImage ? (
-                    <img src={profileImage} alt="Profile" className="h-full w-full object-cover" />
+                    <img
+                      src={profileImage}
+                      alt="Profile"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     formData.name?.charAt(0).toUpperCase() || "U"
                   )}
@@ -271,7 +299,10 @@ const ProfilePage = (): React.ReactNode => {
               </div>
             </div>
 
-            <Button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto rounded-[15px]">
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              className="w-full sm:w-auto rounded-[15px]"
+            >
               Edit Profile
             </Button>
           </div>
@@ -284,12 +315,19 @@ const ProfilePage = (): React.ReactNode => {
           {statCards.map((stat, index) => {
             const Icon = stat.icon;
             return (
-              <div key={index} className="bg-white w-full h-full rounded-[15px] p-4 sm:p-6 border border-gray-200 hover:shadow-md transition duration-200">
+              <div
+                key={index}
+                className="bg-white w-full h-full rounded-[15px] p-4 sm:p-6 border border-gray-200 hover:shadow-md transition duration-200"
+              >
                 <div className="flex flex-col items-start gap-3">
                   <Icon className="w-4 h-4 text-primary" />
                   <div>
-                    <div className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</div>
-                    <div className="text-xs sm:text-sm text-gray-600 mt-1">{stat.label}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-gray-900">
+                      {stat.value}
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-600 mt-1">
+                      {stat.label}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -301,17 +339,25 @@ const ProfilePage = (): React.ReactNode => {
       {/* Tabs */}
       <div className="max-w-6xl mx-auto py-6 px-2 lg:px-0">
         <div className="bg-white rounded-3xl px-2 py-1 flex sm:inline-flex overflow-x-auto max-w-full gap-1">
-          {(["overview", "completed", "achievements"] as TabType[]).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`py-2 px-4 font-semibold text-sm rounded-3xl transition duration-200 whitespace-nowrap flex-shrink-0 ${
-                activeTab === tab ? "bg-primary text-white" : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              {tab === "overview" ? "Overview" : tab === "completed" ? "Completed Courses" : "Achievements"}
-            </button>
-          ))}
+          {(["overview", "completed", "achievements"] as TabType[]).map(
+            (tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-2 px-4 font-semibold text-sm rounded-3xl transition duration-200 whitespace-nowrap flex-shrink-0 ${
+                  activeTab === tab
+                    ? "bg-primary text-white"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                {tab === "overview"
+                  ? "Overview"
+                  : tab === "completed"
+                    ? "Completed Courses"
+                    : "Achievements"}
+              </button>
+            ),
+          )}
         </div>
       </div>
 
@@ -319,21 +365,27 @@ const ProfilePage = (): React.ReactNode => {
       {activeTab === "overview" && (
         <div className="max-w-6xl mx-auto py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-
             {/* Learning Progress */}
             <div className="bg-white rounded-[15px] h-max py-4">
-              <h2 className="text-xl font-bold text-gray-900 px-4 py-4 mb-6">Learning Progress</h2>
+              <h2 className="text-xl font-bold text-gray-900 px-4 py-4 mb-6">
+                Learning Progress
+              </h2>
               <div className="space-y-6 px-4">
                 {learningProgress.length === 0 ? (
                   <p className="text-gray-400 text-sm text-center py-4">
-                    No courses in progress yet. Start a course to track your progress!
+                    No courses in progress yet. Start a course to track your
+                    progress!
                   </p>
                 ) : (
                   learningProgress.map((item, index) => (
                     <div key={item.courseId}>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-gray-700">{item.course}</span>
-                        <span className="text-sm font-semibold text-gray-600">{item.progress}%</span>
+                        <span className="text-sm font-semibold text-gray-700">
+                          {item.course}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-600">
+                          {item.progress}%
+                        </span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div
@@ -349,7 +401,9 @@ const ProfilePage = (): React.ReactNode => {
 
             {/* Recent Achievements */}
             <div className="bg-white rounded-[15px] p-6 h-max">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Achievements</h2>
+              <h2 className="text-xl font-bold text-gray-900 mb-6">
+                Recent Achievements
+              </h2>
               <div className="flex flex-col gap-4">
                 {achievements.length === 0 ? (
                   <p className="text-gray-400 text-sm text-center py-4">
@@ -363,8 +417,12 @@ const ProfilePage = (): React.ReactNode => {
                           <LuAward className="w-7 h-7 text-primary" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-gray-900 text-lg">{achievement.badge}</h3>
-                          <p className="text-xs text-gray-600">{achievement.description}</p>
+                          <h3 className="font-semibold text-gray-900 text-lg">
+                            {achievement.badge}
+                          </h3>
+                          <p className="text-xs text-gray-600">
+                            {achievement.description}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -376,13 +434,18 @@ const ProfilePage = (): React.ReactNode => {
 
           {/* Skills */}
           <div className="mt-12">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Skills & Expertise</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              Skills & Expertise
+            </h2>
             <div className="flex flex-wrap gap-3">
               {skills.length === 0 ? (
                 <p className="text-gray-400 text-sm">No skills added yet.</p>
               ) : (
                 skills.map((skill, index) => (
-                  <button key={index} className="bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-primary px-4 py-2 rounded-full text-sm font-medium transition duration-200">
+                  <button
+                    key={index}
+                    className="bg-gray-100 hover:bg-purple-100 text-gray-700 hover:text-primary px-4 py-2 rounded-full text-sm font-medium transition duration-200"
+                  >
                     {skill}
                   </button>
                 ))
@@ -393,17 +456,88 @@ const ProfilePage = (): React.ReactNode => {
       )}
 
       {activeTab === "completed" && (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg p-8 border border-gray-200 text-center">
-            <p className="text-gray-600">Completed courses content coming soon...</p>
+        <div className="max-w-6xl mx-auto py-8">
+          <div className="bg-white rounded-[15px] p-6 border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              Completed Courses
+            </h2>
+            <div className="space-y-4">
+              {learningProgress.filter(
+                (c) =>
+                  c.progress === 100 || c.status?.toLowerCase() === "completed",
+              ).length === 0 ? (
+                <p className="text-gray-400 text-sm text-center py-4">
+                  You haven't completed any courses yet. Keep learning!
+                </p>
+              ) : (
+                learningProgress
+                  .filter(
+                    (c) =>
+                      c.progress === 100 ||
+                      c.status?.toLowerCase() === "completed",
+                  )
+                  .map((item) => (
+                    <div
+                      key={item.courseId}
+                      className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:shadow-sm"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="bg-green-100 p-2.5 rounded-full flex-shrink-0">
+                          <LuAward className="w-5 h-5 text-green-600" />
+                        </div>
+                        <span className="font-semibold text-gray-800">
+                          {item.course}
+                        </span>
+                      </div>
+                      <span className="text-sm font-bold text-green-600">
+                        Completed
+                      </span>
+                    </div>
+                  ))
+              )}
+            </div>
           </div>
         </div>
       )}
 
       {activeTab === "achievements" && (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg p-8 border border-gray-200 text-center">
-            <p className="text-gray-600">Achievements content coming soon...</p>
+        <div className="max-w-6xl mx-auto py-8">
+          <div className="bg-white rounded-[15px] p-6 border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              My Achievements
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {achievements.length === 0 ? (
+                <p className="text-gray-400 text-sm py-4 col-span-full text-center">
+                  No achievements yet. Complete courses to earn achievements!
+                </p>
+              ) : (
+                achievements.map((achievement) => (
+                  <div
+                    key={achievement._id}
+                    className="border border-gray-100 rounded-lg p-4 flex gap-3 items-center hover:shadow-sm transition"
+                  >
+                    <div className="bg-gray-100 rounded-[12px] p-2.5 flex-shrink-0">
+                      <LuAward className="w-7 h-7 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-lg">
+                        {achievement.badge}
+                      </h3>
+                      <p className="text-xs text-gray-600">
+                        {achievement.description}
+                      </p>
+                      {achievement.earnedAt && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          Earned{" "}
+                          {new Date(achievement.earnedAt).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -414,24 +548,78 @@ const ProfilePage = (): React.ReactNode => {
           <div className="bg-white rounded-[20px] shadow-xl w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Edit Profile</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-gray-700">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
             <div className="space-y-5">
-              <Input label="Full Name" name="name" value={formData.name} onChange={handleChange} size="small" />
-              <Input label="Email Address" name="email" type="email" value={formData.email} onChange={handleChange} icon={<HiOutlineMail className="w-5 h-5" />} size="small" />
-              <Input label="Location" name="location" value={formData.location} onChange={handleChange} icon={<HiMapPin className="w-5 h-5" />} size="small" />
+              <Input
+                label="Full Name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                size="small"
+              />
+              <Input
+                label="Email Address"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                icon={<HiOutlineMail className="w-5 h-5" />}
+                size="small"
+                readOnly={true}
+              />
+              <Input
+                label="Location"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                icon={<HiMapPin className="w-5 h-5" />}
+                size="small"
+              />
+              <Input
+                label="Bio"
+                name="bio"
+                value={formData.bio || ""}
+                onChange={handleChange}
+                icon={<IoBookOutline className="w-5 h-5" />}
+                size="small"
+              />
             </div>
 
             <div className="flex gap-3 mt-8">
-              <Button variant="outline" fullWidth onClick={() => setIsModalOpen(false)} className="rounded-[15px]">
+              <Button
+                variant="outline"
+                fullWidth
+                onClick={() => setIsModalOpen(false)}
+                className="rounded-[15px]"
+              >
                 Cancel
               </Button>
-              <Button fullWidth onClick={handleSave} loading={saving} loadingText="Saving..." className="rounded-[15px]">
+              <Button
+                fullWidth
+                onClick={handleSave}
+                loading={saving}
+                loadingText="Saving..."
+                className="rounded-[15px]"
+              >
                 Save Changes
               </Button>
             </div>
