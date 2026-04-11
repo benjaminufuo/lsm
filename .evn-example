@@ -1,1 +1,2 @@
-VITE_BASE_URL=
+VITE_BASE_URL= "https://talentflow-backend-vo89.onrender.com/api/"
+VITE_GOOGLE_CLIENT_ID = "1012586021341-ireig1gqmds11ujbht9f9pr1ovco5ke9.apps.googleusercontent.com"
