@@ -5,14 +5,18 @@ import {
 } from "react-icons/io5";
 import type { IconType } from "react-icons";
 import TestImage from "../assets/testImg.jpg";
-import LogoIcon from "../assets/icons/logo2.svg?react";
-import LearnFlowIcon from "../assets/icons/learnflow2.svg?react";
+import LogoIcon from "../assets/icons/logo.svg?react";
+import LearnFlowIcon from "../assets/icons/learnflow.svg?react";
 import HamburgerIcon from "../assets/icons/hamburger.svg?react";
 import { useEffect, useState } from "react";
 import { navItems } from "../config/sidebar";
 import SideItems from "./sideitems";
 import { LuLogOut } from "react-icons/lu";
 import { useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { persistor, type RootState } from "../global/store";
+import { HiOutlineArrowLeftOnRectangle } from "react-icons/hi2";
+import { setUserInfo, setUserToken } from "../global/slice";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -21,6 +25,18 @@ const Header = () => {
   const SearchIcon = IoSearchOutline as IconType;
   const NotificationIcon = IoNotificationsOutline as IconType;
   const CloseIcon = IoClose as IconType;
+
+  const user = useSelector((state: RootState) => state.learnFlow.userInfo);
+
+  const dispatch = useDispatch();
+  const handleLogout = async () => {
+      // Reset user state
+      dispatch(setUserToken(""));
+      dispatch(setUserInfo({}));
+      // Purge persisted state
+      await persistor.purge();
+      navigate("/signin");
+    };
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
@@ -43,8 +59,8 @@ const Header = () => {
             <NotificationIcon size={24} className="hidden lg:flex" />
 
             <div className="hidden lg:flex flex-col items-end text-[#4D4D4DE5] text-[14px]">
-              <p className="font-semibold">Sarah Mike</p>
-              <p>Student</p>
+              <p className="font-semibold">{user?.fullName}</p>
+              <p>{user?.role}</p>
             </div>
 
             <div className="ml-2 lg:ml-0">
@@ -73,7 +89,6 @@ const Header = () => {
             <LearnFlowIcon />
           </div>
         </div>
-
 
         {/* Mobile Search and Hamburger Grouped */}
         <div className="flex flex-row items-center gap-2">
@@ -123,12 +138,25 @@ const Header = () => {
                 onClick={() => setIsOpen(false)}
                 className="flex flex-col p-6  "
               >
+                <div className="flex flex-row items-center gap-2 text-white px-2 rounded-2xl shrink-0 overflow-hidden my-4">
+                  <LogoIcon />
+                  <div
+                    className="
+              text-xl text-black whitespace-nowrap overflow-hidden
+              transition-all duration-200
+              
+             
+            "
+                  >
+                    <LearnFlowIcon />
+                  </div>
+                </div>
                 {navItems.map((item) => (
                   <SideItems key={item.path} item={item} variant="mobile" />
                 ))}
               </nav>
 
-              <div className=" mx-4 my-8">
+              {/* <div className=" mx-4 my-8">
                 <button onClick={() => navigate('/signin')} className="flex flex-row items-center justify-center gap-2 p-4 font-light tracking-wider text-[#4D4D4DE5] hover:text-primary cursor-pointer rounded-lg transition-colors duration-200 w-full">
                   <p>Logout</p>
                   <LuLogOut size={20} />
@@ -138,6 +166,21 @@ const Header = () => {
                   <p className="text-[12px] tracking-wide flex justify-center p-4 font-light text-[#4D4D4DE5]">
                     © 2026 TalentFlow
                   </p>
+                </div>
+              </div> */}
+
+              <div className="mx-4 my-8">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex w-full items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 cursor-pointer"
+                >
+                  <HiOutlineArrowLeftOnRectangle className="h-5 w-5 shrink-0" />
+                  <span>Logout</span>
+                </button>
+
+                <div className="rounded-xl border border-slate-200 px-3 py-3 text-xs text-slate-500 text-center">
+                  © 2026 TalentFlow
                 </div>
               </div>
             </div>
