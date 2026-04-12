@@ -11,7 +11,6 @@ import HamburgerIcon from "../assets/icons/hamburger.svg?react";
 import { useEffect, useState } from "react";
 import { navItems } from "../config/sidebar";
 import SideItems from "./sideitems";
-import { LuLogOut } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { persistor, type RootState } from "../global/store";
@@ -32,7 +31,7 @@ const Header = () => {
   const handleLogout = async () => {
       // Reset user state
       dispatch(setUserToken(""));
-      dispatch(setUserInfo({}));
+      dispatch(setUserInfo({_id: "", fullName: "", email: "", role: "", avatar: "", token: ""}));
       // Purge persisted state
       await persistor.purge();
       navigate("/signin");

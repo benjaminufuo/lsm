@@ -6,9 +6,6 @@ import CheckIcon from "../../assets/icons/check.svg?react";
 import ArrowRightIcon from "../../assets/icons/arrowright.svg?react";
 import DashboardCard from "../../components/dashboard-card";
 import { NavLink } from "react-router";
-// import course1 from "../../assets/images/course1.jpg";
-// import course2 from "../../assets/images/course2.jpg";
-// import course3 from "../../assets/images/course3.jpg";
 import CourseCard from "../../components/course-card";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../global/store";
@@ -79,19 +76,6 @@ const Dashboard = () => {
     },
   ];
 
-  const recentActivity = [
-    {
-      title: "Introduction to Hooks",
-      course: "Introduction to Hooks",
-      dueDate: "2 hours ago",
-    },
-    {
-      title: "Submitted assignment",
-      course: "Design System Documentation",
-      dueDate: "1 day ago",
-    },
-  ];
-
   useEffect(() => {
     const loadActiveEnrolledCourses = async () => {
       try {
@@ -122,7 +106,7 @@ const Dashboard = () => {
     <div className="px-2 md:mr-10">
       <div className="mt-2">
         <h2 className="text-2xl font-bold">
-          Welcome back, {user?.fullName.split(" ")[0]} 👋
+          Welcome back, {user?.fullName} 👋
         </h2>
         <p className="text-gray-600 mt-2 tracking-wide">
           You're making great progress. Keep it up!
@@ -174,6 +158,7 @@ const Dashboard = () => {
             <div className="py-22 flex flex-1  items-center justify-center gap-4 text-gray-600 bg-white rounded-2xl">
               <PiReadCvLogoFill size={28} />
               <p>Enroll in a Course</p>
+              <p>{error?.message || "An error occurred"}</p>
             </div>
           )}
         </div>
@@ -227,7 +212,7 @@ const Dashboard = () => {
                     </div>
                     <p className="text-[14px] mb-1">{item.instructorName}</p>
                     <p className="text-[#0A2540] font-semibold">
-                        {timeAgo(item.enrollmentDate)}
+                      {timeAgo(item.enrollmentDate)}
                     </p>
                   </div>
                 ))}
