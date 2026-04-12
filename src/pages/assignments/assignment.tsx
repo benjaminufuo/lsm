@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { IoCalendarOutline, IoTimeOutline } from "react-icons/io5";
 import { LuClipboardList, LuClock, LuSend, LuTrendingUp, LuStar, LuInfo } from "react-icons/lu";
+import Loading from "../../components/Loading";
 
 interface Assignment {
   _id: string;
@@ -58,13 +59,7 @@ const Assignments = () => {
       : a.status === "completed" || a.status === "submitted"
   );
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-stext text-sm">Loading assignments...</p>
-      </div>
-    );
-  }
+  if (loading) return <Loading />;
 
   return (
     <div className="min-h-screen pb-10">
