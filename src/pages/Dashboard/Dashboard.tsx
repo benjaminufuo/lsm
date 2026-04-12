@@ -156,9 +156,14 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="py-22 flex flex-1  items-center justify-center gap-4 text-gray-600 bg-white rounded-2xl">
-              <PiReadCvLogoFill size={28} />
-              <p>Enroll in a Course</p>
-              <p>{error?.message || "An error occurred"}</p>
+              {error ? (
+                <p>{error?.message || "An error occurred"}</p>
+              ) : (
+                <div>
+                  <PiReadCvLogoFill size={28} />
+                  <p>Enroll in a Course</p>
+                </div>
+              )}
             </div>
           )}
         </div>
