@@ -1,4 +1,4 @@
-const BASE_URL = "https://talentflow-backend-vo89.onrender.com";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 type ApiOptions = RequestInit & {
   token?: string | null;
@@ -8,15 +8,19 @@ export async function apiFetch<T>(
   endpoint: string,
   options: ApiOptions = {}
 ): Promise<T> {
+  if (!BASE_URL) {
+    throw new Error("VITE_BASE_URL is not defined");
+  }
+
   const token = options.token ?? localStorage.getItem("token");
 
   const headers: Record<string, string> = {
     ...(options.body ? { "Content-Type": "application/json" } : {}),
-    ...(options.headers as Record<string, string> || {}),
+    ...((options.headers as Record<string, string>) || {}),
   };
 
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers.Authorization = `Bearer ${token}`;
   }
 
   const response = await fetch(`${BASE_URL}${endpoint}`, {

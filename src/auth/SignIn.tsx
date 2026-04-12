@@ -124,7 +124,7 @@ const SignIn: FC = () => {
         );
         return;
       }
-
+      localStorage.setItem("token", token);
       dispatch(setUserToken(token));
       dispatch(setUserInfo(user));
 

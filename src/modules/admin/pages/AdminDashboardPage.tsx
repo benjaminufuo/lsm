@@ -17,6 +17,7 @@ import type { Assignment, Course } from "../types/admin";
 import type { AdminDashboardStats } from "../types/dashboard";
 
 export default function AdminDashboardPage() {
+  
   const navigate = useNavigate();
 
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
