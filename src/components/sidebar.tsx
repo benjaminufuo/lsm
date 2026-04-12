@@ -3,11 +3,25 @@ import { cn } from "../lib/utils";
 import SideItems from "./sideitems";
 import LogoIcon from "../assets/icons/logo.svg?react";
 import LearnFlowIcon from "../assets/icons/learnflow.svg?react";
-import { LuLogOut } from "react-icons/lu";
+
 import { useNavigate } from "react-router";
+import { useDispatch } from "react-redux";
+import { persistor } from "../global/store";
+import { setUserToken, setUserInfo } from "../global/slice";
+import { HiOutlineArrowLeftOnRectangle } from "react-icons/hi2";
 
 const SideBar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    // Reset user state
+    dispatch(setUserToken(""));
+      dispatch(setUserInfo({id: "", fullName: "", email: "", role: "", avatar: "", token: ""}));
+    // Purge persisted state
+    await persistor.purge();
+    navigate("/signin");
+  };
   return (
     <div
       className={cn(
@@ -44,7 +58,7 @@ const SideBar = () => {
         ))}
       </div>
 
-      <div className="mx-4 my-8">
+      {/* <div className="mx-4 my-8">
         <button
           onClick={() => navigate('/signin')}
           className="flex flex-row items-center justify-center gap-2 p-4 font-light tracking-wider text-[#4D4D4DE5] hover:text-primary cursor-pointer rounded-lg transition-colors duration-200 w-full"
@@ -57,6 +71,21 @@ const SideBar = () => {
           <p className="text-[12px] tracking-wide flex justify-center p-4 font-light">
             © 2026 TalentFlow
           </p>
+        </div>
+      </div> */}
+
+      <div className="mx-4 my-8">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex w-full items-center justify-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 cursor-pointer"
+        >
+          <HiOutlineArrowLeftOnRectangle className="h-5 w-5 shrink-0" />
+          <span>Logout</span>
+        </button>
+
+        <div className="rounded-xl border border-slate-200 px-3 py-3 text-xs text-slate-500 text-center">
+          © 2026 TalentFlow
         </div>
       </div>
     </div>
