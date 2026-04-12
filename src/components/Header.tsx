@@ -31,7 +31,7 @@ const Header = () => {
   const handleLogout = async () => {
       // Reset user state
       dispatch(setUserToken(""));
-      dispatch(setUserInfo({_id: "", fullName: "", email: "", role: "", avatar: "", token: ""}));
+      dispatch(setUserInfo({id: "", fullName: "", email: "", role: "", avatar: "", token: ""}));
       // Purge persisted state
       await persistor.purge();
       navigate("/signin");

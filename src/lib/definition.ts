@@ -26,7 +26,7 @@ export interface Assignment {
 }
 
 export interface UserProps {
-  _id: string;
+  id: string;
   fullName: string;
   email: string;
   role: string;
