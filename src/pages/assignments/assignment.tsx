@@ -1,16 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
 import { IoCalendarOutline, IoTimeOutline } from "react-icons/io5";
-import {
-  LuClipboardList,
-  LuClock,
-  LuSend,
-  LuTrendingUp,
-  LuStar,
-  LuInfo,
-} from "react-icons/lu";
+import { LuClipboardList, LuClock, LuSend, LuTrendingUp, LuStar, LuInfo } from "react-icons/lu";
 
 interface Assignment {
-  id: number;
+  _id: string;
   title: string;
   course: string;
   description: string;
@@ -21,96 +16,61 @@ interface Assignment {
   score?: string;
 }
 
-const assignmentsData: Assignment[] = [
-  {
-    id: 1,
-    title: "React Component Architecture",
-    course: "Advanced React Development",
-    description:
-      "Design and implement a scalable component architecture for a complex application.",
-    status: "pending",
-    dueDate: "Mar 22, 2026",
-    daysLeft: 3,
-  },
-  {
-    id: 2,
-    title: "User Research Report",
-    course: "UI/UX Design Fundamentals",
-    description:
-      "Conduct user research and create a comprehensive report with insights.",
-    status: "pending",
-    dueDate: "Mar 25, 2026",
-    daysLeft: 6,
-  },
-  {
-    id: 3,
-    title: "State Management Implementation",
-    course: "Advanced React Development",
-    description:
-      "Implement Redux for state management in a medium-sized application.",
-    status: "pending",
-    dueDate: "Mar 28, 2026",
-    daysLeft: 9,
-  },
-  {
-    id: 4,
-    title: "Data Analysis Project",
-    course: "Data Science with Python",
-    description: "Analyze a dataset and present findings with visualizations.",
-    status: "submitted",
-    dueDate: "Mar 18, 2026",
-    daysLeft: 0,
-    submittedDate: "Mar 18, 2026",
-  },
-  {
-    id: 5,
-    title: "Design System Documentation",
-    course: "UI/UX Design Fundamentals",
-    description: "Create comprehensive documentation for a design system.",
-    status: "submitted",
-    dueDate: "Mar 14, 2026",
-    daysLeft: 0,
-    submittedDate: "Mar 14, 2026",
-    score: "95/100",
-  },
-  {
-    id: 6,
-    title: "Python Data Structures Quiz",
-    course: "Data Science with Python",
-    description: "Complete quiz on advanced Python data structures.",
-    status: "submitted",
-    dueDate: "Mar 10, 2026",
-    daysLeft: 0,
-    submittedDate: "Mar 10, 2026",
-    score: "88/100",
-  },
-];
-
 const Assignments = () => {
-  const [activeTab, setActiveTab] = useState<"pending" | "completed">(
-    "pending",
-  );
+  const userToken = useSelector((state: any) => state.learnFlow.userToken);
+  const [assignmentsData, setAssignmentsData] = useState<Assignment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"pending" | "completed">("pending");
 
-  const pendingCount = assignmentsData.filter(
-    (a) => a.status === "pending",
-  ).length;
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      if (!userToken) return;
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}assignments`,
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+        const data = response.data?.data || response.data;
+        setAssignmentsData(data);
+      } catch (error) {
+        console.error("Failed to fetch assignments:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAssignments();
+  }, [userToken]);
+
+  const pendingCount = assignmentsData.filter((a) => a.status === "pending").length;
   const completedCount = assignmentsData.filter(
-    (a) => a.status === "completed" || a.status === "submitted",
+    (a) => a.status === "completed" || a.status === "submitted"
   ).length;
 
   const filteredAssignments = assignmentsData.filter((a) =>
     activeTab === "pending"
       ? a.status === "pending"
-      : a.status === "completed" || a.status === "submitted",
+      : a.status === "completed" || a.status === "submitted"
   );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-stext text-sm">Loading assignments...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-10">
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-ptext">
-          Assignments
-        </h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-ptext">Assignments</h1>
         <p className="text-stext mt-1 text-sm">
           Track and manage all your course assignments
         </p>
@@ -123,21 +83,23 @@ const Assignments = () => {
             <p className="text-xs text-stext">Total Assignments</p>
             <LuClipboardList size={16} className="text-primary shrink-0" />
           </div>
-          <p className="text-xl md:text-2xl font-bold text-ptext">6</p>
+          <p className="text-xl md:text-2xl font-bold text-ptext">{assignmentsData.length}</p>
         </div>
         <div className="bg-white rounded-xl p-4 md:p-5 border border-bordercolor flex flex-col justify-between gap-4 min-h-[100px]">
           <div className="flex items-center justify-between">
             <p className="text-xs text-stext">Pending</p>
             <LuClock size={16} className="text-primary shrink-0" />
           </div>
-          <p className="text-xl md:text-2xl font-bold text-ptext">3</p>
+          <p className="text-xl md:text-2xl font-bold text-ptext">{pendingCount}</p>
         </div>
         <div className="bg-white rounded-xl p-4 md:p-5 border border-bordercolor flex flex-col justify-between gap-4 min-h-[100px]">
           <div className="flex items-center justify-between">
             <p className="text-xs text-stext">Submitted</p>
             <LuSend size={16} className="text-primary shrink-0" />
           </div>
-          <p className="text-xl md:text-2xl font-bold text-ptext">1</p>
+          <p className="text-xl md:text-2xl font-bold text-ptext">
+            {assignmentsData.filter((a) => a.status === "submitted").length}
+          </p>
         </div>
         <div className="bg-white rounded-xl p-4 md:p-5 border border-bordercolor flex flex-col justify-between gap-4 min-h-[100px]">
           <div className="flex items-center justify-between">
@@ -152,21 +114,19 @@ const Assignments = () => {
       <div className="flex mb-4 bg-gray-100 rounded-full p-1 w-fit">
         <button
           onClick={() => setActiveTab("pending")}
-          className={`px-4 md:px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${
-            activeTab === "pending"
+          className={`px-4 md:px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${activeTab === "pending"
               ? "bg-primary text-white shadow-sm"
               : "text-stext hover:text-ptext"
-          }`}
+            }`}
         >
           Pending ({pendingCount})
         </button>
         <button
           onClick={() => setActiveTab("completed")}
-          className={`px-4 md:px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${
-            activeTab === "completed"
+          className={`px-4 md:px-5 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${activeTab === "completed"
               ? "bg-primary text-white shadow-sm"
               : "text-stext hover:text-ptext"
-          }`}
+            }`}
         >
           Completed ({completedCount})
         </button>
@@ -174,79 +134,74 @@ const Assignments = () => {
 
       {/* Assignment List */}
       <div className="flex flex-col gap-3">
-        {filteredAssignments.map((assignment) => (
-          <div
-            key={assignment.id}
-            className="bg-white rounded-xl border border-bordercolor p-4 md:p-5 flex items-start gap-3 md:gap-4 hover:shadow-sm transition-shadow"
-          >
-            {/* Info icon */}
-            <LuInfo size={20} className="mt-1 shrink-0 text-primary" />
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
-                {/* Left: title, course, description */}
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-ptext leading-snug text-sm md:text-base">
-                    {assignment.title}
-                  </h3>
-                  <p className="text-xs md:text-sm text-stext font-medium mt-0.5">
-                    {assignment.course}
-                  </p>
-                  <p className="text-xs md:text-sm text-stext mt-1 leading-relaxed">
-                    {assignment.description}
-                  </p>
-                </div>
-
-                {/* Right: badge + meta */}
-                <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1.5 shrink-0">
-                  <span
-                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                      assignment.status === "pending"
-                        ? "bg-amber-50 text-amber-600"
-                        : "bg-green-50 text-green-600"
-                    }`}
-                  >
-                    {assignment.status === "pending" ? "Pending" : "Submitted"}
-                  </span>
-
-                  {activeTab === "pending" ? (
-                    <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-0.5 text-xs text-stext">
-                      <span className="flex items-center gap-1">
-                        <IoCalendarOutline size={12} />
-                        Due {assignment.dueDate}
-                      </span>
-                      {assignment.daysLeft > 0 && (
-                        <span className="flex items-center gap-1">
-                          <IoTimeOutline size={12} />
-                          {assignment.daysLeft} days left
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-0.5 text-xs text-stext">
-                      <span className="flex items-center gap-1">
-                        <IoCalendarOutline size={12} />
-                        Submitted {assignment.submittedDate}
-                      </span>
-                      {assignment.score && (
-                        <span className="flex items-center gap-1">
-                          <LuStar size={12} />
-                          Score: {assignment.score}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {filteredAssignments.length === 0 && (
+        {filteredAssignments.length === 0 ? (
           <div className="text-center py-12 text-stext">
             <p className="text-sm">No {activeTab} assignments found.</p>
           </div>
+        ) : (
+          filteredAssignments.map((assignment) => (
+            <div
+              key={assignment._id}
+              className="bg-white rounded-xl border border-bordercolor p-4 md:p-5 flex items-start gap-3 md:gap-4 hover:shadow-sm transition-shadow"
+            >
+              <LuInfo size={20} className="mt-1 shrink-0 text-primary" />
+
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-ptext leading-snug text-sm md:text-base">
+                      {assignment.title}
+                    </h3>
+                    <p className="text-xs md:text-sm text-stext font-medium mt-0.5">
+                      {assignment.course}
+                    </p>
+                    <p className="text-xs md:text-sm text-stext mt-1 leading-relaxed">
+                      {assignment.description}
+                    </p>
+                  </div>
+
+                  <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-1.5 shrink-0">
+                    <span
+                      className={`text-xs px-2.5 py-1 rounded-full font-medium ${assignment.status === "pending"
+                          ? "bg-amber-50 text-amber-600"
+                          : "bg-green-50 text-green-600"
+                        }`}
+                    >
+                      {assignment.status === "pending" ? "Pending" : "Submitted"}
+                    </span>
+
+                    {activeTab === "pending" ? (
+                      <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-0.5 text-xs text-stext">
+                        <span className="flex items-center gap-1">
+                          <IoCalendarOutline size={12} />
+                          Due {assignment.dueDate}
+                        </span>
+                        {assignment.daysLeft > 0 && (
+                          <span className="flex items-center gap-1">
+                            <IoTimeOutline size={12} />
+                            {assignment.daysLeft} days left
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-0.5 text-xs text-stext">
+                        <span className="flex items-center gap-1">
+                          <IoCalendarOutline size={12} />
+                          Submitted {assignment.submittedDate}
+                        </span>
+                        {assignment.score && (
+                          <span className="flex items-center gap-1">
+                            <LuStar size={12} />
+                            Score: {assignment.score}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
         )}
       </div>
     </div>
