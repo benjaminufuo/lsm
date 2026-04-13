@@ -14,6 +14,7 @@ import { LuAward } from "react-icons/lu";
 import { GrLocation } from "react-icons/gr";
 import { FiEdit } from "react-icons/fi";
 import { setUserInfo } from "../../global/slice";
+import Loading from "../../components/Loading";
 
 interface StatCard {
   value: string | number;
@@ -234,12 +235,8 @@ const ProfilePage = (): React.ReactNode => {
   ];
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-500">Loading profile...</p>
-      </div>
-    );
-  }
+  return <Loading />;
+}
 
   return (
     <div className="min-h-screen bg-gray-50">
