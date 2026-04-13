@@ -8,15 +8,20 @@ import { MdOutlineMail } from "react-icons/md";
 import { HiOutlineChartBar } from "react-icons/hi";
 import { IoLockClosedOutline } from "react-icons/io5";
 import { FcGoogle } from "react-icons/fc";
+import { useDispatch } from "react-redux";
 import Button from "../shared/Button/Index";
 import Input from "../shared/Input/Index";
 import leftimg from "../assets/signupleftbg.jpg";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useGoogleLogin } from "@react-oauth/google";
+import { setUserToken, setUserInfo } from "../global/slice";
+import Loading from "../components/Loading";
 
 const SignUp = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const role = (location.state as { role?: string })?.role || "Student";
 
   const isStudent = role.includes("Student");
@@ -28,7 +33,7 @@ const SignUp = () => {
     confirmPassword: "",
     agreeToTerms: false,
   });
-
+  const [googleLoading, setGoogleLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
@@ -96,19 +101,60 @@ const SignUp = () => {
         payload,
       );
       if (response.status === 201) {
-        toast.success("Account created successfully! Please log in.");
-        console.log("account created");
+        toast.success(response.data.message);
+        console.log("account created", response.data.message);
         setTimeout(() => {
           navigate("/signin");
         }, 1500);
       }
-    } catch (error) {
-      toast.error("An error occurred during signup. Please try again.");
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred during signup. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setGoogleLoading(true);
+
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}auth/google`,
+          {
+            accessToken: tokenResponse.access_token,
+            role: isStudent ? "student" : "admin",
+          },
+        );
+
+        const token = response?.data?.data?.token || response?.data?.token;
+        const user = response?.data?.data || response?.data?.user;
+
+        if (token) {
+          dispatch(setUserToken(token));
+          dispatch(setUserInfo(user));
+        }
+        toast.success(response?.data?.message || "Logged in successfully!");
+        navigate(
+          user?.role === "admin" ? "/learnflow/admin" : "/learnflow/dashboard",
+        );
+      } catch (error: any) {
+        toast.error(
+          error.response?.data?.message ||
+            "Google login failed. Please try again.",
+        );
+        setGoogleLoading(false); // Only reset on error so Loading stays mounted during redirect
+      }
+    },
+    onError: () =>
+      toast.error("Google login was cancelled or failed. Please try again."),
+  });
+  if (googleLoading) {
+    return <Loading />;
+  }
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Hero Section */}
@@ -334,13 +380,17 @@ const SignUp = () => {
 
           {/* OAuth Buttons */}
           <Button
+            type="button"
             variant="outline"
             fullWidth
-            icon={<FcGoogle size={20} />}
             className="rounded-[15px]"
             style={{ borderColor: "#d1d5db" }}
-            disabled={loading}
+            disabled={googleLoading}
+            onClick={() => handleGoogleLogin()}
+            loading={googleLoading}
+            loadingText="verifying..."
           >
+            <FcGoogle className="w-5 h-5" />
             Google
           </Button>
 

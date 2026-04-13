@@ -1,4 +1,4 @@
-import type { CourseCardProps, DashboardCardProps } from "../../data/types";
+import type { DashboardCardProps } from "../../data/types";
 import BookIcon from "../../assets/icons/book.svg?react";
 import ClockIcon from "../../assets/icons/clock.svg?react";
 import TrendIcon from "../../assets/icons/trend.svg?react";
@@ -6,101 +6,108 @@ import CheckIcon from "../../assets/icons/check.svg?react";
 import ArrowRightIcon from "../../assets/icons/arrowright.svg?react";
 import DashboardCard from "../../components/dashboard-card";
 import { NavLink } from "react-router";
-import course1 from "../../assets/images/course1.jpg";
-import course2 from "../../assets/images/course2.jpg";
-import course3 from "../../assets/images/course3.jpg";
 import CourseCard from "../../components/course-card";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../global/store";
+import { useEffect, useState } from "react";
+import { getActiveEnrolledCourse, getAssignments } from "../../lib/data";
+import type { ActiveEnrolledCourse } from "../../lib/definition";
+import SkeletonCard from "../../components/skeleton-card";
+import { PiReadCvLogoFill } from "react-icons/pi";
+import { MdAssignmentAdd } from "react-icons/md";
 
 const Dashboard = () => {
+  const token = useSelector((state: RootState) => state.learnFlow.userToken);
+  const [course, setCourse] = useState<ActiveEnrolledCourse | null>(null);
+  const [enrolledCourse, setEnrolledCourse] =
+    useState<ActiveEnrolledCourse | null>(null);
+  const [assignment, setAssignment] = useState<ActiveEnrolledCourse | null>(
+    null,
+  );
+  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const user = useSelector((state: RootState) => state.learnFlow.userInfo);
+
+  const timeAgo = (dateString: string) => {
+    const now = new Date();
+    const past = new Date(dateString);
+
+    const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+    const minutes = Math.floor(diffInSeconds / 60);
+    const hours = Math.floor(diffInSeconds / 3600);
+    const days = Math.floor(diffInSeconds / 86400);
+
+    if (diffInSeconds < 60) return "just now";
+    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  };
+
   const stats: DashboardCardProps[] = [
     {
       title: "Courses Enrolled",
       icon: BookIcon,
-      value: 12,
-      description: "3 active courses",
+      value: enrolledCourse?.data.length || 0,
+      descriptionNumber: enrolledCourse?.data.length || 0,
+      description: "active courses",
     },
     {
       title: "Hours Learned",
       icon: ClockIcon,
-      value: "127",
-      description: "+12 this week",
+      value: 0,
+      descriptionNumber: 0,
+      description: " this week",
     },
     {
       title: "Current Streak",
       icon: TrendIcon,
-      value: "15 days",
+      value: 0,
+      descriptionNumber: null,
       description: "Personal best!",
     },
     {
       title: "Completed",
       icon: CheckIcon,
-      value: "8",
-      description: "67% completion rate",
+      value: 0,
+      descriptionNumber: 0,
+      description: "% completion rate",
     },
   ];
 
-  const activeCourses: CourseCardProps[] = [
-    {
-      imageUrl: course1,
-      title: "Advanced React Development",
-      instructor: "Dr. Emily Zhang",
-      progress: 160,
-      description: "Next: State Management with Redux",
-      percentage: "68%",
-    },
-    {
-      imageUrl: course2,
-      title: "UI/UX Design Fundamentals",
-      instructor: "Dr. Sarah Johnson",
-      progress: 100,
-      description: "Next: Creating User Personas",
-      percentage: "34%",
-    },
-    {
-      imageUrl: course3,
-      title: "Data Science with Python",
-      instructor: "Prof. Marcus Chen",
-      progress: 70,
-      description: "Next: Machine Learning Basics",
-      percentage: "20%",
-    },
-  ];
-
-  const upcomingAssignments = [
-    {
-      title: "React Component Architecture",
-      course: "Advanced React Development",
-      dueDate: "Mar 22, 2026",
-    },
-    {
-      title: "User Research Report",
-      course: "UI/UX Design Fundamentals",
-      dueDate: "Mar 25, 2026",
-    },
-    {
-      title: "Data Analysis Project",
-      course: "Data Analysis Fundamentals",
-      dueDate: "Mar 26, 2026",
-    },
-  ];
-
-  const recentActivity = [
-    {
-      title: "Introduction to Hooks",
-      course: "Introduction to Hooks",
-      dueDate: "2 hours ago",
-    },
-    {
-      title: "Submitted assignment",
-      course: "Design System Documentation",
-      dueDate: "1 day ago",
-    },
-  ];
+  useEffect(() => {
+    const loadActiveEnrolledCourses = async () => {
+      try {
+        setLoading(true);
+        const [activeEnrolledData, assignmentsData, enrolledData] =
+          await Promise.all([
+            getActiveEnrolledCourse(token),
+            getAssignments(token),
+            getActiveEnrolledCourse(token),
+          ]);
+        setCourse(activeEnrolledData);
+        setAssignment(assignmentsData);
+        setEnrolledCourse(enrolledData);
+        console.log(enrolledData, "first course");
+        console.log(assignmentsData, "assignments data");
+      } catch (err) {
+        console.error("Failed to fetch active course data");
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadActiveEnrolledCourses();
+    console.log(user, "user details");
+  }, [user]);
 
   return (
     <div className="px-2 md:mr-10">
       <div className="mt-2">
-        <h2 className="text-2xl font-bold">Welcome back, Miracle 👋</h2>
+        <h2 className="text-2xl font-bold">
+          Welcome back, {user?.fullName} 👋
+        </h2>
         <p className="text-gray-600 mt-2 tracking-wide">
           You're making great progress. Keep it up!
         </p>
@@ -113,6 +120,7 @@ const Dashboard = () => {
             description={item.description}
             value={item.value}
             icon={item.icon}
+            descriptionNumber={item.descriptionNumber}
           />
         ))}
       </div>
@@ -131,45 +139,97 @@ const Dashboard = () => {
               </span>
             </NavLink>
           </div>
-          <div className="flex flex-col gap-4">
-            {activeCourses.map((item) => (
-              <CourseCard
-                imageUrl={item.imageUrl}
-                title={item.title}
-                instructor={item.instructor}
-                progress={item.progress}
-                description={item.description}
-                percentage={item.percentage}
-              />
-            ))}
-          </div>
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+          ) : course?.data.length ? (
+            <div className="flex flex-1 flex-col gap-4">
+              {course?.data.map((item) => (
+                <CourseCard
+                  imageUrl={item.courseImg}
+                  title={item.courseTitle}
+                  instructor={item.instructorName}
+                  progress={item.progress}
+                  description={item.category}
+                  percentage={item.rating}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="py-22 flex flex-1  items-center justify-center gap-4 text-gray-600 bg-white rounded-2xl">
+              {error ? (
+                <p>{error?.message || "An error occurred"}</p>
+              ) : (
+                <div>
+                  <PiReadCvLogoFill size={28} />
+                  <p>Enroll in a Course</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="mt-8 w-full md:flex-1">
           <h2 className="text-2xl font-bold mb-4">Upcoming Assignments</h2>
           <div className="bg-white p-2.5 gap-2.5 rounded-2xl">
-            <div className="flex flex-col gap-4">
-              {upcomingAssignments.map((item) => (
-                <div className=" py-1.5">
-                  <div
-                    key={item.title}
-                    className="flex flex-row justify-between items-center"
-                  >
-                    <h4 className="text-md font-semibold mb-1">{item.title}</h4>
-                    <ClockIcon />
+            {assignment?.data.length ? (
+              <div className="flex flex-col gap-4">
+                {assignment.data.map((item) => (
+                  <div className=" py-1.5">
+                    <div
+                      key={item.courseImg}
+                      className="flex flex-row justify-between items-center"
+                    >
+                      <h4 className="text-md font-semibold mb-1">
+                        {item.courseTitle}
+                      </h4>
+                      <ClockIcon />
+                    </div>
+                    <p className="text-[14px] mb-1">{item.category}</p>
+                    <p className="text-[#0A2540] font-semibold">
+                      Due {item.instructorName}
+                    </p>
                   </div>
-                  <p className="text-[14px] mb-1">{item.course}</p>
-                  <p className="text-[#0A2540] font-semibold">
-                    Due {item.dueDate}
-                  </p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-1 items-center justify-center py-22 gap-4 text-gray-600">
+                <MdAssignmentAdd size={28} />
+                <p>Nothing to show</p>
+              </div>
+            )}
           </div>
 
           <h2 className="text-2xl font-bold my-4">Recent Activity</h2>
           <div className="bg-white p-2.5 gap-2.5 rounded-2xl">
-            <div className="flex flex-col gap-4">
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+            ) : course?.data.length ? (
+              <div className="flex flex-1 flex-col gap-4">
+                {course?.data.map((item) => (
+                  <div className=" py-1.5">
+                    <div
+                      key={item.courseImg}
+                      className="flex flex-row justify-between items-center"
+                    >
+                      <h4 className="text-md font-semibold mb-1">
+                        {item.courseTitle}
+                      </h4>
+                    </div>
+                    <p className="text-[14px] mb-1">{item.instructorName}</p>
+                    <p className="text-[#0A2540] font-semibold">
+                      {timeAgo(item.enrollmentDate)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-22 flex flex-1  items-center justify-center gap-4 text-gray-600 bg-white rounded-2xl">
+                <PiReadCvLogoFill size={28} />
+                <p>Nothing to show</p>
+              </div>
+            )}
+
+            {/* <div className="flex flex-col gap-4">
               {recentActivity.map((item) => (
                 <div className=" py-1.5">
                   <div
@@ -182,7 +242,7 @@ const Dashboard = () => {
                   <p className="text-[#0A2540] font-semibold">{item.dueDate}</p>
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

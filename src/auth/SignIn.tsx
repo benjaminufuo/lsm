@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { FC } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LuCheck } from "react-icons/lu";
 import { MdOutlineArrowBack, MdOutlineMail } from "react-icons/md";
 import { IoLockClosedOutline } from "react-icons/io5";
@@ -12,6 +12,8 @@ import { useDispatch } from "react-redux";
 import { setUserToken, setUserInfo } from "../global/slice";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useGoogleLogin } from "@react-oauth/google";
+import Loading from "../components/Loading";
 
 const SignIn: FC = () => {
   const navigate = useNavigate();
@@ -21,9 +23,23 @@ const SignIn: FC = () => {
     password: "",
     rememberMe: false,
   });
-
+  const [googleLoading, setGoogleLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isResending, setIsResending] = useState<boolean>(false);
+  const [showResend, setShowResend] = useState<boolean>(false);
+
+  // On component mount, check if we previously remembered an email
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setFormData((prev) => ({
+        ...prev,
+        email: savedEmail,
+        rememberMe: true,
+      }));
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -89,37 +105,62 @@ const SignIn: FC = () => {
         {
           email: formData.email,
           password: formData.password,
+          rememberMe: formData.rememberMe,
         },
       );
 
-      console.log("API Response:", response.data);
+      // console.log("API Response:", response.data);
 
-      const token = response.data?.data?.token || response.data?.token;
-      const user = response.data?.data || response.data?.user;
+      const token = response?.data?.data?.token || response.data?.token;
+      const user = response?.data?.data || response.data?.user;
+      // console.log(response?.data?.message);
 
       if (!token) {
         toast.error(
           "Login successful, but no token was found in the response!",
         );
-        console.error(
+        console.log(
           "Missing token. Check your API response structure:",
           response.data,
         );
-        return; // Stop here so PrivateRoute doesn't instantly kick you out
+        return;
       }
 
       dispatch(setUserToken(token));
       dispatch(setUserInfo(user));
 
-      toast.success(response.data?.message || "Logged in successfully!");
+      // Handle the Remember Me local storage
+      if (formData.rememberMe) {
+        localStorage.setItem("rememberedEmail", formData.email);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+      }
+
+      toast.success(response?.data?.message || "Logged in successfully!");
       if (user?.role?.toLowerCase() === "admin") {
         navigate("/learnflow/admin");
       } else {
         navigate("/learnflow/dashboard");
       }
     } catch (error: any) {
-      if (error.response?.data?.message === "Invalid credentials") {
+      console.log(error);
+      const errorMessage = error?.response?.data?.message;
+
+      // If the error indicates the email isn't verified, show the resend button
+      if (
+        errorMessage &&
+        (errorMessage.toLowerCase().includes("verify") ||
+          errorMessage.toLowerCase().includes("verified"))
+      ) {
+        setShowResend(true);
+      } else {
+        setShowResend(false);
+      }
+
+      if (errorMessage === "Invalid credentials") {
         toast.error("Invalid email or password. Please try again.");
+      } else if (errorMessage) {
+        toast.error(errorMessage);
       } else {
         toast.error("An error occurred. Please try again later.");
       }
@@ -127,6 +168,65 @@ const SignIn: FC = () => {
       setLoading(false);
     }
   };
+
+  const handleResendVerification = async () => {
+    setIsResending(true);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}auth/resend-verification`,
+        { email: formData.email },
+      );
+      toast.success(
+        response?.data?.message || "Verification email resent successfully!",
+      );
+      setShowResend(false); // Hide the button after successful resend
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to resend verification email. Please try again.",
+      );
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setGoogleLoading(true);
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BASE_URL}auth/google`,
+          { accessToken: tokenResponse.access_token },
+        );
+
+        const token = response?.data?.data?.token || response.data?.token;
+        const user = response?.data?.data || response.data?.user;
+
+        if (token) {
+          dispatch(setUserToken(token));
+          dispatch(setUserInfo(user));
+          toast.success(response?.data?.message || "Logged in successfully!");
+          navigate(
+            user?.role?.toLowerCase() === "admin"
+              ? "/learnflow/admin"
+              : "/learnflow/dashboard",
+          );
+        }
+      } catch (error: any) {
+        // console.log(error);
+        toast.error(
+          error?.response?.data?.message ||
+            "Google login failed. Please try again.",
+        );
+        setGoogleLoading(false); // Only reset on error so Loading stays mounted during redirect
+      }
+    },
+    onError: () => toast.error("Google Login Failed"),
+  });
+
+  if (googleLoading) {
+    return <Loading />;
+  }
 
   const stats = [
     { value: "500+", label: "Courses" },
@@ -285,6 +385,23 @@ const SignIn: FC = () => {
             >
               Log In
             </Button>
+
+            {/* Resend Verification Button */}
+            {showResend && (
+              <Button
+                type="button"
+                variant="outline"
+                fullWidth
+                disabled={isResending}
+                loading={isResending}
+                loadingText="Resending..."
+                onClick={handleResendVerification}
+                className="rounded-[15px]"
+                style={{ borderColor: "#d1d5db", marginTop: "1rem" }}
+              >
+                Resend Verification Email
+              </Button>
+            )}
           </form>
 
           {/* Divider */}
@@ -305,8 +422,12 @@ const SignIn: FC = () => {
               type="button"
               variant="outline"
               style={{ borderColor: "#d1d5db" }}
-              className="rounded-[8px]"
+              className="rounded-[15px]"
               fullWidth
+              onClick={() => handleGoogleLogin()}
+              disabled={googleLoading}
+              loading={googleLoading}
+              loadingText="Verifying..."
             >
               <FcGoogle className="w-5 h-5" />
               Google

@@ -1,73 +1,95 @@
-# React + TypeScript + Vite
+# 🎓 TalentFlow LMS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to **TalentFlow**, a modern Learning Management System (LMS) designed to unlock full potential through seamless course management and student learning journeys.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Secure Authentication:** JWT-based email/password login and Google OAuth integration.
+- **Role-Based Access Control:** Distinct dashboards for Students and Administrators.
+- **Course Management:** Browse, enroll, and track progress across 500+ courses.
+- **Responsive Design:** Fully responsive UI built with Tailwind CSS.
+- **Interactive UI:** Toast notifications, loading states, and form validation.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework:** React 18 with Vite
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Routing:** React Router DOM
+- **State Management:** Redux Toolkit
+- **HTTP Client:** Axios
+- **Authentication:** `@react-oauth/google`
+- **UI Components:** React Icons, React Toastify
 
-## Expanding the ESLint configuration
+## 📋 Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Ensure you have the following installed on your local machine:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js (v16 or higher)
+- npm, yarn, or pnpm
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## ⚙️ Installation & Setup
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/your-username/talentflow-lms.git
+   cd talentflow-lms
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Configure Environment Variables:**
+   Create a `.env` file in the root directory and add the necessary variables:
+
+   ```env
+   VITE_BASE_URL=http://localhost:5000/api/v1/
+   # Add your Google Client ID if applicable
+   VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+   ```
+
+4. **Start the development server:**
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+5. **Open the app:**
+   Navigate to `http://localhost:5173` in your browser.
+
+## 📂 Project Structure
+
+```text
+src/
+├── assets/        # Static assets like images and icons
+├── auth/          # Authentication components (SignIn, SignUp, etc.)
+├── global/        # Redux store and slices
+├── shared/        # Reusable UI components (Button, Input, etc.)
+├── App.tsx        # Main application component
+└── main.tsx       # React entry point
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📜 Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `npm run dev`: Starts the local development server.
+- `npm run build`: Compiles the TypeScript code and bundles the app for production.
+- `npm run lint`: Runs ESLint to check for code quality issues.
+- `npm run preview`: Previews the production build locally.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the project.
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.

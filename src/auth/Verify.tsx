@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
 import { toast } from "react-toastify";
 import Button from "../shared/Button/Index";
+import axios from "axios";
 
 const Verify = () => {
   const [searchParams] = useSearchParams();
@@ -21,16 +22,19 @@ const Verify = () => {
       }
 
       try {
-        // --- ACTUAL API CALL (Uncomment when backend is ready) ---
-        // await axios.post(`${import.meta.env.VITE_BASE_URL}auth/verify-email`, { token });
-
-        // Simulated Network Request
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}auth/verify-email`,
+          { params: { token } },
+        );
         setIsVerified(true);
-        toast.success("Account verified successfully!");
-      } catch (error) {
-        toast.error("Verification failed. The link might be expired.");
+        toast.success(
+          response.data.message || "Account verified successfully!",
+        );
+      } catch (error: any) {
+        toast.error(
+          error.response?.data?.message ||
+            "Verification failed. The link might be expired.",
+        );
       } finally {
         setLoading(false);
       }
