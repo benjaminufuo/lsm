@@ -13,6 +13,7 @@ import { setUserToken, setUserInfo } from "../global/slice";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
+import Loading from "../components/Loading";
 
 const SignIn: FC = () => {
   const navigate = useNavigate();
@@ -108,11 +109,11 @@ const SignIn: FC = () => {
         },
       );
 
-      console.log("API Response:", response.data);
+      // console.log("API Response:", response.data);
 
       const token = response?.data?.data?.token || response.data?.token;
       const user = response?.data?.data || response.data?.user;
-      console.log(response?.data?.message);
+      // console.log(response?.data?.message);
 
       if (!token) {
         toast.error(
@@ -212,17 +213,20 @@ const SignIn: FC = () => {
           );
         }
       } catch (error: any) {
-        console.log(error);
+        // console.log(error);
         toast.error(
           error?.response?.data?.message ||
             "Google login failed. Please try again.",
         );
-      } finally {
-        setGoogleLoading(false);
+        setGoogleLoading(false); // Only reset on error so Loading stays mounted during redirect
       }
     },
     onError: () => toast.error("Google Login Failed"),
   });
+
+  if (googleLoading) {
+    return <Loading />;
+  }
 
   const stats = [
     { value: "500+", label: "Courses" },
