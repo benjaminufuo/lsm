@@ -7,7 +7,8 @@ export interface NavItemType {
 export interface DashboardCardProps {
   title: string;
   icon: React.ElementType;
-  value: string | number;
+  value: number;
+  descriptionNumber: number | null;
   description: string;
 }
 
@@ -17,5 +18,5 @@ export interface CourseCardProps{
   instructor: string;
   progress: number;
   description: string;
-  percentage: string;
+  percentage: number;
 }

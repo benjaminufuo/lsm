@@ -1,13 +1,14 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { UserProps } from "../lib/definition";
 
 export interface LearnFlowState {
   userToken: "";
-  userInfo?: {};
+  userInfo: UserProps | null;
 }
 
 const initialState: LearnFlowState = {
   userToken: "",
-  userInfo: {},
+  userInfo: null,
 };
 
 export const slice = createSlice({
@@ -17,8 +18,8 @@ export const slice = createSlice({
     setUserToken: (state, { payload }) => {
       state.userToken = payload;
     },
-    setUserInfo: (state, { payload }) => {
-      state.userInfo = payload;
+    setUserInfo: (state, action: PayloadAction<UserProps>) => {
+      state.userInfo = action.payload;
     },
   },
 });

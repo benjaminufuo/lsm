@@ -5,6 +5,7 @@ const DashboardCard = ({
   title,
   icon: Icon,
   value,
+  descriptionNumber,
   description,
 }: DashboardCardProps) => {
   return (
@@ -20,7 +21,7 @@ const DashboardCard = ({
       </div>
 
       <div>
-        <p className="text-[#0A2540] text-[12px] font-medium tracking-wide">{description}</p>
+        <p className="text-[#0A2540] text-[12px] font-medium tracking-wide">{descriptionNumber } {description}</p>
       </div>
     </div>
   );
