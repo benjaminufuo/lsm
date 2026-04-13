@@ -24,7 +24,7 @@ const CousrseCard = ({
           <div className="flex flex-row items-center justify-between ">
             <h2 className="text-[12px] md:text-lg font-semibold ">{title}</h2>
             <span className="text-black bg-[#F5F7FAE5] py-1 px-3.5 rounded-2xl font-medium">
-              {percentage}
+              {percentage}%
             </span>
           </div>
           <p className="text-gray-500 text-xs mt-1">{instructor}</p>
