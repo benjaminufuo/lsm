@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
 import { setUserToken, setUserInfo } from "../global/slice";
+import Loading from "../components/Loading";
 
 const SignUp = () => {
   const location = useLocation();
@@ -119,10 +120,14 @@ const SignUp = () => {
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setGoogleLoading(true);
+
       try {
         const response = await axios.post(
           `${import.meta.env.VITE_BASE_URL}auth/google`,
-          { accessToken: tokenResponse.access_token },
+          {
+            accessToken: tokenResponse.access_token,
+            role: isStudent ? "student" : "admin",
+          },
         );
 
         const token = response?.data?.data?.token || response?.data?.token;
@@ -141,14 +146,15 @@ const SignUp = () => {
           error.response?.data?.message ||
             "Google login failed. Please try again.",
         );
-      } finally {
-        setGoogleLoading(false);
+        setGoogleLoading(false); // Only reset on error so Loading stays mounted during redirect
       }
     },
     onError: () =>
       toast.error("Google login was cancelled or failed. Please try again."),
   });
-
+  if (googleLoading) {
+    return <Loading />;
+  }
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Hero Section */}
