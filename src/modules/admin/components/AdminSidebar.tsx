@@ -44,6 +44,7 @@ export default function AdminSidebar({ open, onClose }: Props) {
 
   const handleLogout = () => {
     onClose();
+    localStorage.removeItem("token");
     toast.info("Logout logic will be wired later.");
     navigate("/signin");
   };
