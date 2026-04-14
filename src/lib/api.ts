@@ -1,30 +1,50 @@
-import axios from "axios";
-// import { useSelector } from "react-redux";
-// import type { RootState } from "../global/store";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-export const api = axios.create({
-    baseURL: import.meta.env.VITE_BASE_URL,
-    headers: {
-        "Content-Type": "application/json",
-    },
-});
+type ApiOptions = RequestInit & {
+  token?: string | null;
+};
 
-// api.interceptors.request.use(
-//     (config) => {
-//         const token = useSelector((state: RootState) => state.learnFlow.userToken)
+export async function apiFetch<T>(
+  endpoint: string,
+  options: ApiOptions = {}
+): Promise<T> {
+  if (!BASE_URL) {
+    throw new Error("VITE_BASE_URL is not defined");
+  }
 
-//         if(token && config.headers) {
-//             console.log(token,"here");
-            
-//             config.headers.Authorization = `Bearer ${token}`
-//         }else{
-//             console.log("no token");
-            
-//         }
+  const token = options.token ?? localStorage.getItem("token");
 
-//         return config;
-//     },
-//     (error) => {
-//         return Promise.reject(error)
-//     }
-// )
+  const headers: Record<string, string> = {
+    ...(options.body ? { "Content-Type": "application/json" } : {}),
+    ...((options.headers as Record<string, string>) || {}),
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
+  if (response.status === 401 || response.status === 403) {
+  localStorage.removeItem("token");
+  window.location.href = "/login";
+}
+  let data: unknown = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const err = data as { message?: string; error?: string } | null;
+    throw new Error(
+      err?.message || err?.error || `Request failed with status ${response.status}`
+    );
+  }
+
+  return data as T;
+}

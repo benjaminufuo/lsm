@@ -10,14 +10,20 @@ import CourseCard from "../../components/course-card";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../global/store";
 import { useEffect, useState } from "react";
-import { getActiveEnrolledCourse, getAssignments } from "../../lib/data";
-import type { ActiveEnrolledCourse } from "../../lib/definition";
+import {
+  getActiveEnrolledCourse,
+  getAssignments,
+  getEnrolledCourse,
+  type ActiveEnrolledCourse,
+} from "../../lib/data";
 import SkeletonCard from "../../components/skeleton-card";
 import { PiReadCvLogoFill } from "react-icons/pi";
 import { MdAssignmentAdd } from "react-icons/md";
 
 const Dashboard = () => {
   const token = useSelector((state: RootState) => state.learnFlow.userToken);
+  const user = useSelector((state: RootState) => state.learnFlow.userInfo);
+
   const [course, setCourse] = useState<ActiveEnrolledCourse | null>(null);
   const [enrolledCourse, setEnrolledCourse] =
     useState<ActiveEnrolledCourse | null>(null);
@@ -26,8 +32,6 @@ const Dashboard = () => {
   );
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-  const user = useSelector((state: RootState) => state.learnFlow.userInfo);
 
   const timeAgo = (dateString: string) => {
     const now = new Date();
@@ -80,27 +84,34 @@ const Dashboard = () => {
     const loadActiveEnrolledCourses = async () => {
       try {
         setLoading(true);
+        setError(null);
+
+        const authToken = token || localStorage.getItem("token");
+
+        if (!authToken) {
+          throw new Error("No token found");
+        }
+
         const [activeEnrolledData, assignmentsData, enrolledData] =
           await Promise.all([
-            getActiveEnrolledCourse(token),
-            getAssignments(token),
-            getActiveEnrolledCourse(token),
+            getActiveEnrolledCourse(authToken),
+            getAssignments(authToken),
+            getEnrolledCourse(authToken),
           ]);
+
         setCourse(activeEnrolledData);
         setAssignment(assignmentsData);
         setEnrolledCourse(enrolledData);
-        console.log(enrolledData, "first course");
-        console.log(assignmentsData, "assignments data");
       } catch (err) {
-        console.error("Failed to fetch active course data");
+        console.error("Failed to fetch dashboard data", err);
         setError(err as Error);
       } finally {
         setLoading(false);
       }
     };
+
     loadActiveEnrolledCourses();
-    console.log(user, "user details");
-  }, [user]);
+  }, [token]);
 
   return (
     <div className="px-2 md:mr-10">
@@ -108,14 +119,15 @@ const Dashboard = () => {
         <h2 className="text-2xl font-bold">
           Welcome back, {user?.fullName} 👋
         </h2>
-        <p className="text-gray-600 mt-2 tracking-wide">
+        <p className="mt-2 tracking-wide text-gray-600">
           You're making great progress. Keep it up!
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row mt-5 gap-4">
+      <div className="mt-5 flex flex-col gap-4 md:flex-row">
         {stats.map((item) => (
           <DashboardCard
+            key={item.title}
             title={item.title}
             description={item.description}
             value={item.value}
@@ -125,13 +137,13 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 w-full">
-        <div className="w-full md:w-7/12 mt-8 flex flex-col gap-4">
-          <div className="flex flex-row items-center justify-between ">
+      <div className="flex w-full flex-col gap-4 md:flex-row">
+        <div className="mt-8 flex w-full flex-col gap-4 md:w-7/12">
+          <div className="flex flex-row items-center justify-between">
             <h2 className="md:text-2xl font-bold">Active Courses</h2>
             <NavLink
               to="/learnflow/courses"
-              className="text-sm text-primary flex flex-row items-center gap-2"
+              className="text-primary flex flex-row items-center gap-2 text-sm"
             >
               <span>View all</span>
               <span className="ml-1">
@@ -139,12 +151,14 @@ const Dashboard = () => {
               </span>
             </NavLink>
           </div>
+
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
           ) : course?.data.length ? (
             <div className="flex flex-1 flex-col gap-4">
-              {course?.data.map((item) => (
+              {course.data.map((item) => (
                 <CourseCard
+                  key={item.enrollmentId}
                   imageUrl={item.courseImg}
                   title={item.courseTitle}
                   instructor={item.instructorName}
@@ -155,9 +169,9 @@ const Dashboard = () => {
               ))}
             </div>
           ) : (
-            <div className="py-22 flex flex-1  items-center justify-center gap-4 text-gray-600 bg-white rounded-2xl">
+            <div className="flex flex-1 items-center justify-center gap-4 rounded-2xl bg-white py-22 text-gray-600">
               {error ? (
-                <p>{error?.message || "An error occurred"}</p>
+                <p>{error.message || "An error occurred"}</p>
               ) : (
                 <div>
                   <PiReadCvLogoFill size={28} />
@@ -169,80 +183,59 @@ const Dashboard = () => {
         </div>
 
         <div className="mt-8 w-full md:flex-1">
-          <h2 className="text-2xl font-bold mb-4">Upcoming Assignments</h2>
-          <div className="bg-white p-2.5 gap-2.5 rounded-2xl">
+          <h2 className="mb-4 text-2xl font-bold">Upcoming Assignments</h2>
+          <div className="gap-2.5 rounded-2xl bg-white p-2.5">
             {assignment?.data.length ? (
               <div className="flex flex-col gap-4">
                 {assignment.data.map((item) => (
-                  <div className=" py-1.5">
-                    <div
-                      key={item.courseImg}
-                      className="flex flex-row justify-between items-center"
-                    >
-                      <h4 className="text-md font-semibold mb-1">
+                  <div key={item.enrollmentId} className="py-1.5">
+                    <div className="flex flex-row items-center justify-between">
+                      <h4 className="mb-1 text-md font-semibold">
                         {item.courseTitle}
                       </h4>
                       <ClockIcon />
                     </div>
-                    <p className="text-[14px] mb-1">{item.category}</p>
-                    <p className="text-[#0A2540] font-semibold">
+                    <p className="mb-1 text-[14px]">{item.category}</p>
+                    <p className="font-semibold text-[#0A2540]">
                       Due {item.instructorName}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-1 items-center justify-center py-22 gap-4 text-gray-600">
+              <div className="flex flex-1 items-center justify-center gap-4 py-22 text-gray-600">
                 <MdAssignmentAdd size={28} />
                 <p>Nothing to show</p>
               </div>
             )}
           </div>
 
-          <h2 className="text-2xl font-bold my-4">Recent Activity</h2>
-          <div className="bg-white p-2.5 gap-2.5 rounded-2xl">
+          <h2 className="my-4 text-2xl font-bold">Recent Activity</h2>
+          <div className="gap-2.5 rounded-2xl bg-white p-2.5">
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
             ) : course?.data.length ? (
               <div className="flex flex-1 flex-col gap-4">
-                {course?.data.map((item) => (
-                  <div className=" py-1.5">
-                    <div
-                      key={item.courseImg}
-                      className="flex flex-row justify-between items-center"
-                    >
-                      <h4 className="text-md font-semibold mb-1">
+                {course.data.map((item) => (
+                  <div key={item.enrollmentId} className="py-1.5">
+                    <div className="flex flex-row items-center justify-between">
+                      <h4 className="mb-1 text-md font-semibold">
                         {item.courseTitle}
                       </h4>
                     </div>
-                    <p className="text-[14px] mb-1">{item.instructorName}</p>
-                    <p className="text-[#0A2540] font-semibold">
+                    <p className="mb-1 text-[14px]">{item.instructorName}</p>
+                    <p className="font-semibold text-[#0A2540]">
                       {timeAgo(item.enrollmentDate)}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="py-22 flex flex-1  items-center justify-center gap-4 text-gray-600 bg-white rounded-2xl">
+              <div className="flex flex-1 items-center justify-center gap-4 rounded-2xl bg-white py-22 text-gray-600">
                 <PiReadCvLogoFill size={28} />
                 <p>Nothing to show</p>
               </div>
             )}
-
-            {/* <div className="flex flex-col gap-4">
-              {recentActivity.map((item) => (
-                <div className=" py-1.5">
-                  <div
-                    key={item.title}
-                    className="flex flex-row justify-between items-center"
-                  >
-                    <h4 className="text-md font-semibold mb-1">{item.title}</h4>
-                  </div>
-                  <p className="text-[14px] mb-1">{item.course}</p>
-                  <p className="text-[#0A2540] font-semibold">{item.dueDate}</p>
-                </div>
-              ))}
-            </div> */}
           </div>
         </div>
       </div>
