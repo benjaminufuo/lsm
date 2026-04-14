@@ -33,6 +33,7 @@ export default function AdminDashboardPage() {
   const handleViewSubmissions = (id: string) => {
     // TODO: Uncomment when the Submissions page and route are created
     // navigate(`/learnflow/admin/assignments/${id}`);
+    console.log("View submissions for:", id); // Added to satisfy TS unused variable rule
     toast.info("View submissions feature coming soon!");
   };
 
