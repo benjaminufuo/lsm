@@ -1,6 +1,7 @@
-import { apiFetch } from "../../../lib/api";
+import api from "../../../lib/api";
 import type { AdminDashboardResponse } from "../types/dashboard";
 
-export function getAdminDashboard() {
-  return apiFetch<AdminDashboardResponse>("dashboard/admin");
+export async function getAdminDashboard() {
+  const response = await api.get<AdminDashboardResponse>("dashboard/admin");
+  return response.data;
 }

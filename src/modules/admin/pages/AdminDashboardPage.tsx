@@ -15,11 +15,12 @@ import {
 } from "../data/dashboardMapper";
 import type { Assignment, Course } from "../types/admin";
 import type { AdminDashboardStats } from "../types/dashboard";
+import Loading from "../../../components/Loading";
+import { useSelector } from "react-redux";
 
 export default function AdminDashboardPage() {
-  
   const navigate = useNavigate();
-
+  const userInfo = useSelector((state: any) => state?.learnFlow?.userInfo);
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [recentCourses, setRecentCourses] = useState<Course[]>([]);
   const [recentAssignments, setRecentAssignments] = useState<Assignment[]>([]);
@@ -30,7 +31,10 @@ export default function AdminDashboardPage() {
   const goToAssignments = () => navigate("/learnflow/admin/assignments");
 
   const handleViewSubmissions = (id: string) => {
-    navigate(`/learnflow/admin/assignments/${id}`);
+    // TODO: Uncomment when the Submissions page and route are created
+    // navigate(`/learnflow/admin/assignments/${id}`);
+    console.log("View submissions for:", id); // Added to satisfy TS unused variable rule
+    toast.info("View submissions feature coming soon!");
   };
 
   useEffect(() => {
@@ -44,7 +48,7 @@ export default function AdminDashboardPage() {
         setStats(data.stats);
         setRecentCourses(data.recentCourses.map(mapDashboardCourseToCourse));
         setRecentAssignments(
-          data.recentAssignments.map(mapDashboardAssignmentToAssignment)
+          data.recentAssignments.map(mapDashboardAssignmentToAssignment),
         );
       } catch (err) {
         const message =
@@ -60,11 +64,7 @@ export default function AdminDashboardPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="mx-auto max-w-7xl pt-6">
-        <p className="text-sm text-slate-500">Loading dashboard...</p>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -79,7 +79,7 @@ export default function AdminDashboardPage() {
     <div className="mx-auto max-w-7xl space-y-6 pt-3 sm:space-y-8 sm:pt-6">
       <section className="hidden sm:block">
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-          Welcome back, Miracle 👋
+          Welcome back, {userInfo?.fullName?.split(" ")[0] || "Admin"} 👋
         </h1>
         <p className="mt-2 text-sm text-slate-500 sm:text-base">
           Upload and manage your course and assignments.
@@ -142,7 +142,9 @@ export default function AdminDashboardPage() {
         />
 
         <QuickActionCard
-          icon={<HiOutlineClipboardDocumentList className="h-5 w-5 sm:h-6 sm:w-6" />}
+          icon={
+            <HiOutlineClipboardDocumentList className="h-5 w-5 sm:h-6 sm:w-6" />
+          }
           title="Upload New Assignment"
           text="Add and assign new assignment to courses"
           buttonText="+ New Assignment"
@@ -200,7 +202,9 @@ export default function AdminDashboardPage() {
                 />
               ))
             ) : (
-              <p className="text-sm text-slate-500">No recent assignments found.</p>
+              <p className="text-sm text-slate-500">
+                No recent assignments found.
+              </p>
             )}
           </div>
         </div>

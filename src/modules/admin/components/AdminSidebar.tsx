@@ -9,7 +9,7 @@ import {
 } from "react-icons/hi2";
 import { toast } from "react-toastify";
 import { cn } from "../../../shared/utils/cn";
-import logo from "../../../assets/LearnFlow_Logo lockup V1 PB-cropped.svg";
+import logo from "../../../../public/preview-image.png";
 
 type Props = {
   open: boolean;
@@ -54,15 +54,17 @@ export default function AdminSidebar({ open, onClose }: Props) {
       <div
         className={cn(
           "fixed inset-0 z-40 bg-slate-900/40 transition lg:hidden",
-          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+          open
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0",
         )}
         onClick={onClose}
       />
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col border-r border-slate-200 bg-white px-3 py-4 transition-transform lg:static lg:z-auto lg:w-72 lg:translate-x-0 lg:px-4 lg:py-5",
-          open ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col overflow-y-auto border-r border-slate-200 bg-white px-3 py-4 transition-transform lg:sticky lg:top-0 lg:h-screen lg:z-auto lg:w-72 lg:translate-x-0 lg:px-4 lg:py-5",
+          open ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="mb-5 flex items-center justify-between px-2">
@@ -100,7 +102,7 @@ export default function AdminSidebar({ open, onClose }: Props) {
                     "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
                     isActive
                       ? "bg-violet-500 text-white"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                   )
                 }
               >
