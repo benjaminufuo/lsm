@@ -20,6 +20,7 @@ import AdminUsersPage from "./modules/admin/pages/AdminUsersPage";
 
 import CourseDetail from "./pages/courses/courseDetail";
 import Verify from "./auth/Verify.tsx";
+import AdminSubmissionsPage from "./modules/admin/pages/AdminSubmissionsPage.tsx";
 
 const App = () => {
   const router = createBrowserRouter([
@@ -110,6 +111,10 @@ const App = () => {
                 {
                   path: "users",
                   element: <AdminUsersPage />,
+                },
+                {
+                  path: "adminSubmissions/:id",
+                  element: <AdminSubmissionsPage />,
                 },
               ],
             },

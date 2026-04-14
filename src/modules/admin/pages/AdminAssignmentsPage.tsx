@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MdOutlineArrowBack, MdOutlineMessage } from "react-icons/md";
+import { MdLayers, MdOutlineArrowBack } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "../../../shared/Button/Index";
@@ -10,35 +10,10 @@ import type { AssignmentCreatePayload, CourseResponse } from "../types/admin";
 
 export default function AdminAssignmentsPage() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [courses, setCourses] = useState<CourseResponse[]>([]);
-  const [loadingCourses, setLoadingCourses] = useState(true);
-  const [attachment, setAttachment] = useState<File | null>(null);
-  const [formData, setFormData] = useState<AssignmentCreatePayload>({
-    title: "",
-    description: "",
-    course: "",
-    dueDate: "",
-    totalMarks: undefined,
-  });
 
-  useEffect(() => {
-    // Fetch courses for the select dropdown
-    const fetchCourses = async () => {
-      try {
-        const data = await courseApi.getAll();
-        setCourses(data);
-      } catch (error) {
-        console.error("Error fetching courses:", error);
-        toast.error("Failed to load courses");
-      } finally {
-        setLoadingCourses(false);
-      }
-    };
-    fetchCourses();
-  }, []);
-
-  const handleDescriptionInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
+  const handleDescriptionInput = (
+    event: React.FormEvent<HTMLTextAreaElement>,
+  ) => {
     const target = event.currentTarget;
     target.style.height = "auto";
     target.style.height = `${target.scrollHeight}px`;
@@ -114,98 +89,68 @@ export default function AdminAssignmentsPage() {
           <MdOutlineArrowBack className="h-4 w-4" />
           Back to Dashboard
         </button>
-        <h1 className="text-2xl font-bold text-slate-900">Upload New Assignment</h1>
+        <h1 className="text-2xl font-bold text-slate-900">
+          Upload New Assignment
+        </h1>
         <p className="mt-2 mb-4 text-sm text-slate-500">
-          Upload and manage assignments.
+          Create and assign new assignments to courses
         </p>
       </div>
 
       <div className="rounded-xl bg-white p-6 shadow-sm">
         <h1 className="text-2xl mt-10 text-slate-900">Assignment Details</h1>
-
         <label
-          htmlFor="assignment-attachment"
+          htmlFor="cover-image"
           className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 px-6 py-10 text-center transition-colors hover:border-violet-400"
         >
-          <MdOutlineMessage className="mt-3 h-10 w-10 text-slate-500" />
+          <MdLayers className="h-10 w-10 text-slate-500" />
           <p className="mt-4 text-lg font-medium text-slate-800">
-            {attachment ? attachment.name : "Click to upload an attachment"}
+            Click to upload an assignment file or image
           </p>
           <p className="mt-2 text-sm text-slate-500">or drag and drop</p>
-          <p className="mt-2 text-sm text-slate-400">PDF, DOCX... Max 20mb</p>
+          <p className="mt-2 text-sm text-slate-400">Max 5mb</p>
         </label>
-        <input
-          id="assignment-attachment"
-          type="file"
-          accept=".pdf,.doc,.docx"
-          className="hidden"
-          onChange={handleAttachmentChange}
-        />
+        <input id="cover-image" type="file" className="hidden" />
 
         <div className="mt-6 space-y-5">
-          <div>
-            <label className="text-lg font-medium text-slate-800">Assignment Title *</label>
-            <Input
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              placeholder="Enter assignment title"
-              className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-lg font-medium text-slate-800">Assign to Course *</label>
-              <select
-                name="course"
-                value={formData.course}
-                onChange={handleInputChange}
-                disabled={loadingCourses}
-                className="w-full rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10 disabled:opacity-50"
-              >
-                <option value="">
-                  {loadingCourses ? "Loading courses..." : "Select course"}
-                </option>
-                {courses.map((course) => (
-                  <option key={course.courseId} value={course.courseId}>
-                    {course.courseTitle}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-lg font-medium text-slate-800">Due Date *</label>
-              <input
-                type="date"
-                name="dueDate"
-                value={formData.dueDate}
-                onChange={handleInputChange}
-                className="w-full rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="text-lg font-medium text-slate-800">Total Marks</label>
-            <Input
-              name="totalMarks"
-              type="number"
-              value={formData.totalMarks ?? ""}
-              onChange={handleInputChange}
-              placeholder="Enter total marks"
-              className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
-            />
-          </div>
+          <label className="text-lg font-medium text-slate-800">
+            Assignment Title
+          </label>
+          <Input
+            placeholder="Enter assignment title"
+            className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+          />
 
           <div className="space-y-2">
-            <label className="text-lg font-medium text-slate-800">Description *</label>
+            <label className="text-lg font-medium text-slate-800">
+              Select Course
+            </label>
+            <select
+              defaultValue=""
+              className="w-full rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
+            >
+              <option value="" disabled>
+                Choose a course
+              </option>
+              {/* Dummy options for now until we fetch the teacher's active courses */}
+              <option value="1">Course 1</option>
+              <option value="2">Course 2</option>
+            </select>
+          </div>
+
+          <label className="text-lg font-medium text-slate-800">Due Date</label>
+          <Input
+            type="date"
+            placeholder="Select due date"
+            className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+          />
+
+          <div className="space-y-2">
+            <label className="text-lg font-medium text-slate-800">
+              Assignment Description
+            </label>
             <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Write brief description of the assignment"
+              placeholder="Write a brief description of the assignment"
               rows={1}
               onInput={handleDescriptionInput}
               className="w-full overflow-hidden resize-none rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out placeholder:text-[#727a86] hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
@@ -221,7 +166,7 @@ export default function AdminAssignmentsPage() {
               className="w-full rounded-2xl text-gray-500 sm:flex-1"
             />
             <Button
-              label={loading ? "Creating..." : "Create Assignment"}
+              label="Publish Assignment"
               size="large"
               onClick={handleCreate}
               disabled={loading || loadingCourses}

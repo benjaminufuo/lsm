@@ -14,6 +14,7 @@ import {
   getActiveEnrolledCourse,
   getAssignments,
   getEnrolledCourse,
+  type UserProps,
   type ActiveEnrolledCourse,
 } from "../../lib/data";
 import SkeletonCard from "../../components/skeleton-card";
@@ -22,7 +23,9 @@ import { MdAssignmentAdd } from "react-icons/md";
 
 const Dashboard = () => {
   const token = useSelector((state: RootState) => state.learnFlow.userToken);
-  const user = useSelector((state: RootState) => state.learnFlow.userInfo);
+  const user = useSelector(
+    (state: RootState) => state.learnFlow.userInfo as UserProps,
+  );
 
   const [course, setCourse] = useState<ActiveEnrolledCourse | null>(null);
   const [enrolledCourse, setEnrolledCourse] =
@@ -94,9 +97,9 @@ const Dashboard = () => {
 
         const [activeEnrolledData, assignmentsData, enrolledData] =
           await Promise.all([
-            getActiveEnrolledCourse(authToken),
-            getAssignments(authToken),
-            getEnrolledCourse(authToken),
+            getActiveEnrolledCourse(),
+            getAssignments(),
+            getEnrolledCourse(),
           ]);
 
         setCourse(activeEnrolledData);

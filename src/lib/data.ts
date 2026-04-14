@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import api from "./api";
 
 export interface ActiveEnrolledCourseData {
   courseId: string;
@@ -37,35 +37,21 @@ export interface UserProps {
   token: string;
 }
 
-export const getActiveEnrolledCourse = async (token: string) => {
-  return apiFetch<ActiveEnrolledCourse>(
-    "/api/enrollments/my-courses?status=active",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+export const getActiveEnrolledCourse = async () => {
+  const response = await api.get<ActiveEnrolledCourse>(
+    "enrollments/my-courses?status=active",
   );
+  return response.data;
 };
 
-export const getEnrolledCourse = async (token: string) => {
-  return apiFetch<ActiveEnrolledCourse>(
-    "/api/enrollments/my-courses",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
+export const getEnrolledCourse = async () => {
+  const response = await api.get<ActiveEnrolledCourse>(
+    "enrollments/my-courses",
   );
+  return response.data;
 };
 
-export const getAssignments = async (token: string) => {
-  return apiFetch<Assignment>(
-    "/api/assignments?page=1&limit=20",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+export const getAssignments = async () => {
+  const response = await api.get<Assignment>("assignments?page=1&limit=20");
+  return response.data;
 };

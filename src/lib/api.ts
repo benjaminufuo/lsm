@@ -1,50 +1,37 @@
+import axios from "axios";
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-type ApiOptions = RequestInit & {
-  token?: string | null;
-};
+if (!BASE_URL) {
+  throw new Error("VITE_BASE_URL is not defined");
+}
 
-export async function apiFetch<T>(
-  endpoint: string,
-  options: ApiOptions = {}
-): Promise<T> {
-  if (!BASE_URL) {
-    throw new Error("VITE_BASE_URL is not defined");
-  }
+const api = axios.create({
+  baseURL: BASE_URL,
+});
 
-  const token = options.token ?? localStorage.getItem("token");
-
-  const headers: Record<string, string> = {
-    ...(options.body ? { "Content-Type": "application/json" } : {}),
-    ...((options.headers as Record<string, string>) || {}),
-  };
-
+// Request interceptor to automatically add the token to all requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
   if (token) {
-    headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
+  return config;
+});
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
-  if (response.status === 401 || response.status === 403) {
-  localStorage.removeItem("token");
-  window.location.href = "/login";
-}
-  let data: unknown = null;
+// Response interceptor to globally handle session expiration (401/403)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      localStorage.removeItem("token");
+      window.location.href = "/signin";
+    }
+    return Promise.reject(error);
+  },
+);
 
-  try {
-    data = await response.json();
-  } catch {
-    data = null;
-  }
-
-  if (!response.ok) {
-    const err = data as { message?: string; error?: string } | null;
-    throw new Error(
-      err?.message || err?.error || `Request failed with status ${response.status}`
-    );
-  }
-
-  return data as T;
-}
+export default api;
