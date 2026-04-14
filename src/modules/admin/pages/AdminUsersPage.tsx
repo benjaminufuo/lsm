@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Button from "../../../shared/Button/Index";
 import Input from "../../../shared/Input/Index";
+import Loading from "../../../components/Loading";
 import { userApi } from "../api/userApi";
 import type { AdminUser, StudentUser, UserCreatePayload, UserTab } from "../types/admin";
 
@@ -60,6 +61,10 @@ export default function AdminUsersPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  if (loadingUsers) {
+    return <Loading />;
+  }
 
   const currentPage = pageByTab[activeTab];
   const currentRows = activeTab === "students" ? studentUsers : adminUsers;
@@ -225,11 +230,7 @@ export default function AdminUsersPage() {
       </div>
 
       <div className="rounded-xl bg-white p-6 shadow-sm sm:p-8">
-        {loadingUsers ? (
-          <div className="flex items-center justify-center py-8">
-            <p className="text-slate-500">Loading users...</p>
-          </div>
-        ) : activeTab === "students" ? (
+        {activeTab === "students" ? (
           <div className="overflow-hidden rounded-2xl">
             <div className="space-y-3 md:hidden">
               {studentUsers
