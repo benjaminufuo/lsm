@@ -217,7 +217,7 @@ export default function AdminCoursesPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-4">
               <label className="text-lg font-medium text-slate-800">
-                Lessons (JSON)
+                Lessons
               </label>
             </div>
             <textarea
@@ -228,7 +228,6 @@ export default function AdminCoursesPage() {
               rows={4}
               className="w-full overflow-hidden resize-none rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] font-mono transition-all duration-200 ease-in-out placeholder:text-[#727a86] hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
             />
-            <p className="text-xs text-slate-500">JSON stringified array of lesson objects</p>
           </div>
 
           <div className="flex w-full flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:gap-12">
