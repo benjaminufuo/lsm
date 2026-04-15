@@ -4,6 +4,32 @@ import type {
   AdminDashboardCourse,
 } from "../types/dashboard";
 
+type MappableDashboardCourse = Omit<AdminDashboardCourse, "instructor"> & {
+  courseId?: string;
+  courseTitle?: string;
+  title?: string;
+  courseImg?: string;
+  thumbnail?: string;
+  instructorName?: string;
+  instructor?:
+    | string
+    | {
+        name?: string;
+        fullName?: string;
+      }
+    | null;
+};
+
+type MappableDashboardAssignment = Omit<AdminDashboardAssignment, "course"> & {
+  image?: string;
+  course?:
+    | string
+    | {
+        title?: string;
+        thumbnail?: string;
+      };
+};
+
 const COURSE_FALLBACK_IMAGE = "https://via.placeholder.com/150?text=Course";
 
 const ASSIGNMENT_FALLBACK_IMAGE =
@@ -12,7 +38,7 @@ const ASSIGNMENT_FALLBACK_IMAGE =
 export function mapDashboardCourseToCourse(
   course: AdminDashboardCourse,
 ): Course {
-  const c = course as any; // Cast to any to handle the actual API payload fields
+  const c: MappableDashboardCourse = course;
 
   // Defensively handle cases where the backend populates the instructor object
   const instructorName =
@@ -38,7 +64,7 @@ export function mapDashboardCourseToCourse(
 export function mapDashboardAssignmentToAssignment(
   assignment: AdminDashboardAssignment,
 ): Assignment {
-  const a = assignment as any;
+  const a: MappableDashboardAssignment = assignment;
 
   // Extract the title if the backend populated the course object
   const courseTitle =

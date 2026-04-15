@@ -1,15 +1,86 @@
+import { useState } from "react";
 import { MdLayers, MdOutlineArrowBack } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Button from "../../../shared/Button/Index";
 import Input from "../../../shared/Input/Index";
+import { courseApi } from "../api/courseApi";
+import type { CourseCreatePayload } from "../types/admin";
 
 export default function AdminCoursesPage() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [formData, setFormData] = useState<CourseCreatePayload>({
+    title: "",
+    description: "",
+    category: "",
+    duration: 0,
+    difficulty: "beginner",
+    instructorName: "",
+    instructorBio: "",
+    lessons: "[]",
+  });
 
   const handleDescriptionInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
     const target = event.currentTarget;
     target.style.height = "auto";
     target.style.height = `${target.scrollHeight}px`;
+  };
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      setThumbnail(e.target.files[0]);
+    }
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "duration" ? parseFloat(value) : value,
+    }));
+  };
+
+  const handleCancel = () => {
+    navigate("/learnflow/admin/dashboard");
+  };
+
+  const handlePublish = async () => {
+    // Validate required fields
+    if (!formData.title.trim()) {
+      toast.error("Course title is required");
+      return;
+    }
+    if (!formData.description.trim()) {
+      toast.error("Course description is required");
+      return;
+    }
+    if (!thumbnail) {
+      toast.error("Course thumbnail is required");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const payload: CourseCreatePayload = {
+        ...formData,
+        thumbnail,
+        lessons: formData.lessons || "[]",
+      };
+
+      const course = await courseApi.create(payload);
+      
+      toast.success(`Course "${course.courseTitle}" created successfully!`);
+      navigate("/learnflow/admin/dashboard");
+    } catch (error) {
+      console.error("Error creating course:", error);
+      toast.error("Failed to create course. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,49 +108,106 @@ export default function AdminCoursesPage() {
         >
           <MdLayers className="h-10 w-10 text-slate-500" />
           <p className="mt-4 text-lg font-medium text-slate-800">
-            Click to upload a cover image
+            {thumbnail ? thumbnail.name : "Click to upload a cover image"}
           </p>
           <p className="mt-2 text-sm text-slate-500">or drag and drop</p>
           <p className="mt-2 text-sm text-slate-400">1200x600px...Max 2mb</p>
         </label>
-        <input id="cover-image" type="file" accept="image/*" className="hidden" />
+        <input
+          id="cover-image"
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleThumbnailChange}
+        />
 
         <div className="mt-6 space-y-5">
-          <label className="text-lg font-medium text-slate-800">Course Title</label>
-          <Input
-            placeholder="Enter course title"
-            className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
-          />
+          <div>
+            <label className="text-lg font-medium text-slate-800">Course Title *</label>
+            <Input
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              placeholder="Enter course title"
+              className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+            />
+          </div>
 
-          <label className="text-lg font-medium text-slate-800">Instructor Name</label>
-          <Input
-            placeholder="Enter"
-            className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
-          />
+          <div>
+            <label className="text-lg font-medium text-slate-800">Instructor Name</label>
+            <Input
+              name="instructorName"
+              value={formData.instructorName}
+              onChange={handleInputChange}
+              placeholder="Enter instructor name"
+              className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+            />
+          </div>
 
-          <div className="space-y-2">
-            <label className="text-lg font-medium text-slate-800">Lesson</label>
-            <select
-              defaultValue=""
-              className="w-full rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
-            >
-              <option value="" disabled>
-                Select numbers of lesson
-              </option>
-              <option value="1">1 Lesson</option>
-              <option value="2">2 Lessons</option>
-              <option value="3">3 Lessons</option>
-              <option value="4">4 Lessons</option>
-              <option value="5">5 Lessons</option>
-            </select>
+          <div>
+            <label className="text-lg font-medium text-slate-800">Instructor Bio</label>
+            <textarea
+              name="instructorBio"
+              value={formData.instructorBio}
+              onChange={handleInputChange}
+              placeholder="Brief biography of the instructor"
+              rows={3}
+              onInput={handleDescriptionInput}
+              className="w-full overflow-hidden resize-none rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out placeholder:text-[#727a86] hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-lg font-medium text-slate-800">Category</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleInputChange}
+                className="w-full rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
+              >
+                <option value="">Select category</option>
+                <option value="Programming">Programming</option>
+                <option value="Design">Design</option>
+                <option value="Business">Business</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-lg font-medium text-slate-800">Difficulty</label>
+              <select
+                name="difficulty"
+                value={formData.difficulty}
+                onChange={handleInputChange}
+                className="w-full rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-lg font-medium text-slate-800">Duration (hours)</label>
+            <Input
+              name="duration"
+              type="number"
+              value={formData.duration}
+              onChange={handleInputChange}
+              placeholder="Enter course duration in hours"
+              className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+            />
           </div>
 
           <div className="space-y-2">
-            <label className="text-lg font-medium text-slate-800  ">
-              Course Description
-            </label>
+            <label className="text-lg font-medium text-slate-800">Course Description *</label>
             <textarea
-              placeholder="Write bried of the description of the course"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Write brief description of the course"
               rows={1}
               onInput={handleDescriptionInput}
               className="w-full overflow-hidden resize-none rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out placeholder:text-[#727a86] hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
@@ -89,18 +217,16 @@ export default function AdminCoursesPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-4">
               <label className="text-lg font-medium text-slate-800">
-                Course Content
+                Lessons
               </label>
-              <button
-                type="button"
-                className="text-sm font-medium text-violet-500 transition-colors hover:text-violet-600"
-              >
-                Add New +
-              </button>
             </div>
-            <Input
-              placeholder="Enter course content"
-              className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+            <textarea
+              name="lessons"
+              value={formData.lessons}
+              onChange={handleInputChange}
+              placeholder='[{"title": "Intro", "content": "..."}]'
+              rows={4}
+              className="w-full overflow-hidden resize-none rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] font-mono transition-all duration-200 ease-in-out placeholder:text-[#727a86] hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
             />
           </div>
 
@@ -109,12 +235,15 @@ export default function AdminCoursesPage() {
               variant="outline"
               label="Cancel"
               size="large"
+              onClick={handleCancel}
               className="w-full rounded-2xl text-gray-500 sm:flex-1"
             />
             <Button
-              label="Publish Course"
+              label={loading ? "Publishing..." : "Publish Course"}
               size="large"
-              className="w-full rounded-2xl bg-violet-500 text-white hover:bg-violet-600 sm:flex-1"
+              onClick={handlePublish}
+              disabled={loading}
+              className="w-full rounded-2xl bg-violet-500 text-white hover:bg-violet-600 disabled:opacity-50 sm:flex-1"
             />
           </div>
         </div>
