@@ -29,6 +29,7 @@ export default function AdminDashboardPage() {
 
   const goToCourses = () => navigate("/learnflow/admin/courses");
   const goToAssignments = () => navigate("/learnflow/admin/assignments");
+  const goToEditCourse = (courseId: string) => navigate(`/learnflow/admin/courses/${courseId}`);
 
   const handleViewSubmissions = (id: string) => {
     navigate(`/learnflow/admin/adminSubmissions/${id}`);
@@ -167,7 +168,7 @@ export default function AdminDashboardPage() {
           <div className="space-y-3 sm:space-y-4">
             {recentCourses.length > 0 ? (
               recentCourses.map((course) => (
-                <CourseCard key={course.id} course={course} />
+                <CourseCard key={course.id} course={course} onClick={goToEditCourse} />
               ))
             ) : (
               <p className="text-sm text-slate-500">No recent courses found.</p>

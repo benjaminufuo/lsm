@@ -5,7 +5,41 @@ import { toast } from "react-toastify";
 import Button from "../../../shared/Button/Index";
 import Input from "../../../shared/Input/Index";
 import { courseApi } from "../api/courseApi";
-import type { CourseCreatePayload } from "../types/admin";
+import type { CourseCreatePayload, LessonCreatePayload } from "../types/admin";
+
+type LessonResourceDraft = {
+  title: string;
+  url: string;
+  type: string;
+};
+
+type LessonDraft = {
+  title: string;
+  description: string;
+  content: string;
+  videoUrl: string;
+  duration: string;
+  isPreviewable: boolean;
+  resources: LessonResourceDraft[];
+  attachmentsText: string;
+};
+
+const createEmptyResource = (): LessonResourceDraft => ({
+  title: "",
+  url: "",
+  type: "",
+});
+
+const createEmptyLesson = (): LessonDraft => ({
+  title: "",
+  description: "",
+  content: "",
+  videoUrl: "",
+  duration: "",
+  isPreviewable: false,
+  resources: [],
+  attachmentsText: "",
+});
 
 export default function AdminCoursesPage() {
   const navigate = useNavigate();
@@ -19,8 +53,8 @@ export default function AdminCoursesPage() {
     difficulty: "beginner",
     instructorName: "",
     instructorBio: "",
-    lessons: "[]",
   });
+  const [lessons, setLessons] = useState<LessonDraft[]>([]);
 
   const handleDescriptionInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
     const target = event.currentTarget;
@@ -48,6 +82,130 @@ export default function AdminCoursesPage() {
     navigate("/learnflow/admin/dashboard");
   };
 
+  const addLesson = () => {
+    setLessons((prev) => [...prev, createEmptyLesson()]);
+  };
+
+  const removeLesson = (lessonIndex: number) => {
+    setLessons((prev) => prev.filter((_, index) => index !== lessonIndex));
+  };
+
+  const updateLessonField = (
+    lessonIndex: number,
+    field: keyof Omit<LessonDraft, "resources">,
+    value: string | boolean,
+  ) => {
+    setLessons((prev) =>
+      prev.map((lesson, index) =>
+        index === lessonIndex ? { ...lesson, [field]: value } : lesson,
+      ),
+    );
+  };
+
+  const addResource = (lessonIndex: number) => {
+    setLessons((prev) =>
+      prev.map((lesson, index) =>
+        index === lessonIndex
+          ? { ...lesson, resources: [...lesson.resources, createEmptyResource()] }
+          : lesson,
+      ),
+    );
+  };
+
+  const removeResource = (lessonIndex: number, resourceIndex: number) => {
+    setLessons((prev) =>
+      prev.map((lesson, index) =>
+        index === lessonIndex
+          ? {
+              ...lesson,
+              resources: lesson.resources.filter((_, rIndex) => rIndex !== resourceIndex),
+            }
+          : lesson,
+      ),
+    );
+  };
+
+  const updateResourceField = (
+    lessonIndex: number,
+    resourceIndex: number,
+    field: keyof LessonResourceDraft,
+    value: string,
+  ) => {
+    setLessons((prev) =>
+      prev.map((lesson, index) => {
+        if (index !== lessonIndex) return lesson;
+
+        return {
+          ...lesson,
+          resources: lesson.resources.map((resource, rIndex) =>
+            rIndex === resourceIndex ? { ...resource, [field]: value } : resource,
+          ),
+        };
+      }),
+    );
+  };
+
+  const buildLessonsPayload = (): LessonCreatePayload[] => {
+    return lessons.map((lesson, index) => {
+      const title = lesson.title.trim();
+      const description = lesson.description.trim();
+      const content = lesson.content.trim();
+      const videoUrl = lesson.videoUrl.trim();
+      const duration = Number(lesson.duration);
+
+      if (!title || !description || !content || !videoUrl || Number.isNaN(duration)) {
+        throw new Error(
+          `Lesson ${index + 1} is missing required fields: title, description, content, video URL, duration`,
+        );
+      }
+
+      const payload: LessonCreatePayload = {
+        title,
+        description,
+        content,
+        videoUrl,
+        duration,
+      };
+
+      if (lesson.isPreviewable) {
+        payload.isPreviewable = true;
+      }
+
+      if (lesson.resources.length > 0) {
+        const resources = lesson.resources
+          .map((resource) => ({
+            title: resource.title.trim(),
+            url: resource.url.trim(),
+            type: resource.type.trim(),
+          }))
+          .filter((resource) => resource.title || resource.url || resource.type);
+
+        const hasIncompleteResource = resources.some(
+          (resource) => !resource.title || !resource.url || !resource.type,
+        );
+        if (hasIncompleteResource) {
+          throw new Error(
+            `Lesson ${index + 1} has an incomplete resource. Fill title, URL, and type or remove it.`,
+          );
+        }
+
+        if (resources.length > 0) {
+          payload.resources = JSON.stringify(resources);
+        }
+      }
+
+      const attachments = lesson.attachmentsText
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+      if (attachments.length > 0) {
+        payload.attachments = attachments;
+      }
+
+      return payload;
+    });
+  };
+
   const handlePublish = async () => {
     // Validate required fields
     if (!formData.title.trim()) {
@@ -65,19 +223,32 @@ export default function AdminCoursesPage() {
 
     setLoading(true);
     try {
+      const lessonsPayload = buildLessonsPayload();
+
       const payload: CourseCreatePayload = {
         ...formData,
         thumbnail,
-        lessons: formData.lessons || "[]",
       };
 
       const course = await courseApi.create(payload);
+
+      if (!course.courseId) {
+        throw new Error("Course created but courseId is missing in response");
+      }
+
+      if (lessonsPayload.length > 0) {
+        await Promise.all(
+          lessonsPayload.map((lesson) => courseApi.createLesson(course.courseId, lesson)),
+        );
+      }
       
       toast.success(`Course "${course.courseTitle}" created successfully!`);
       navigate("/learnflow/admin/dashboard");
     } catch (error) {
       console.error("Error creating course:", error);
-      toast.error("Failed to create course. Please try again.");
+      const message =
+        error instanceof Error ? error.message : "Failed to create course. Please try again.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -219,15 +390,176 @@ export default function AdminCoursesPage() {
               <label className="text-lg font-medium text-slate-800">
                 Lessons
               </label>
+              <button
+                type="button"
+                onClick={addLesson}
+                className="rounded-lg border border-violet-200 px-3 py-1 text-sm font-medium text-violet-600 hover:bg-violet-50"
+              >
+                + Add Lesson
+              </button>
             </div>
-            <textarea
-              name="lessons"
-              value={formData.lessons}
-              onChange={handleInputChange}
-              placeholder='[{"title": "Intro", "content": "..."}]'
-              rows={4}
-              className="w-full overflow-hidden resize-none rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[14px] text-sm text-[#011a2a] font-mono transition-all duration-200 ease-in-out placeholder:text-[#727a86] hover:border-[#667085] hover:bg-white focus:outline-none focus:border-[#7300ff] focus:bg-white focus:ring-2 focus:ring-[#7300ff]/10"
-            />
+            {lessons.length === 0 ? (
+              <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+                No lessons added yet. Click "Add Lesson" to include lessons in this course.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {lessons.map((lesson, lessonIndex) => (
+                  <div key={lessonIndex} className="rounded-2xl border border-slate-200 p-4">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <h3 className="text-base font-semibold text-slate-800">
+                        Lesson {lessonIndex + 1}
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={() => removeLesson(lessonIndex)}
+                        className="rounded-md border border-red-200 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                      >
+                        Remove
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium text-slate-700">Title *</label>
+                        <Input
+                          value={lesson.title}
+                          onChange={(event) => updateLessonField(lessonIndex, "title", event.target.value)}
+                          placeholder="Lesson title"
+                          className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-slate-700">Description *</label>
+                        <textarea
+                          value={lesson.description}
+                          onChange={(event) => updateLessonField(lessonIndex, "description", event.target.value)}
+                          rows={2}
+                          onInput={handleDescriptionInput}
+                          className="w-full overflow-hidden resize-none rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[12px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out placeholder:text-[#727a86] hover:border-[#667085] focus:outline-none focus:border-[#7300ff] focus:ring-2 focus:ring-[#7300ff]/10"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-slate-700">Content *</label>
+                        <textarea
+                          value={lesson.content}
+                          onChange={(event) => updateLessonField(lessonIndex, "content", event.target.value)}
+                          rows={3}
+                          onInput={handleDescriptionInput}
+                          className="w-full overflow-hidden resize-none rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[12px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out placeholder:text-[#727a86] hover:border-[#667085] focus:outline-none focus:border-[#7300ff] focus:ring-2 focus:ring-[#7300ff]/10"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">Video URL *</label>
+                          <Input
+                            value={lesson.videoUrl}
+                            onChange={(event) => updateLessonField(lessonIndex, "videoUrl", event.target.value)}
+                            placeholder="https://..."
+                            className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">Duration (minutes) *</label>
+                          <Input
+                            type="number"
+                            value={lesson.duration}
+                            onChange={(event) => updateLessonField(lessonIndex, "duration", event.target.value)}
+                            placeholder="10"
+                            className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+                          />
+                        </div>
+                      </div>
+
+                      <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={lesson.isPreviewable}
+                          onChange={(event) => updateLessonField(lessonIndex, "isPreviewable", event.target.checked)}
+                          className="h-4 w-4 rounded border-slate-300 text-violet-500 focus:ring-violet-500"
+                        />
+                        Allow preview without enrollment
+                      </label>
+
+                      <div className="space-y-2 rounded-xl bg-slate-50 p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <label className="text-sm font-medium text-slate-700">Resources (optional)</label>
+                          <button
+                            type="button"
+                            onClick={() => addResource(lessonIndex)}
+                            className="rounded-md border border-violet-200 px-3 py-1 text-xs font-medium text-violet-600 hover:bg-violet-50"
+                          >
+                            + Add Resource
+                          </button>
+                        </div>
+
+                        {lesson.resources.length === 0 ? (
+                          <p className="text-xs text-slate-500">No resources added.</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {lesson.resources.map((resource, resourceIndex) => (
+                              <div key={resourceIndex} className="rounded-lg border border-slate-200 bg-white p-3">
+                                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                                  <Input
+                                    value={resource.title}
+                                    onChange={(event) =>
+                                      updateResourceField(lessonIndex, resourceIndex, "title", event.target.value)
+                                    }
+                                    placeholder="Resource title"
+                                    className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+                                  />
+                                  <Input
+                                    value={resource.url}
+                                    onChange={(event) =>
+                                      updateResourceField(lessonIndex, resourceIndex, "url", event.target.value)
+                                    }
+                                    placeholder="https://..."
+                                    className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+                                  />
+                                  <Input
+                                    value={resource.type}
+                                    onChange={(event) =>
+                                      updateResourceField(lessonIndex, resourceIndex, "type", event.target.value)
+                                    }
+                                    placeholder="pdf, link, video..."
+                                    className="[&_input]:bg-white [&_input]:hover:bg-white [&_input]:focus:bg-white"
+                                  />
+                                </div>
+                                <div className="mt-2 flex justify-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => removeResource(lessonIndex, resourceIndex)}
+                                    className="text-xs font-medium text-red-600 hover:text-red-700"
+                                  >
+                                    Remove resource
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-slate-700">
+                          Attachments (optional, one URL per line)
+                        </label>
+                        <textarea
+                          value={lesson.attachmentsText}
+                          onChange={(event) => updateLessonField(lessonIndex, "attachmentsText", event.target.value)}
+                          rows={2}
+                          className="w-full resize-none rounded-[15px] border border-[#98a2b3] bg-white px-[17px] py-[12px] text-sm text-[#011a2a] transition-all duration-200 ease-in-out placeholder:text-[#727a86] hover:border-[#667085] focus:outline-none focus:border-[#7300ff] focus:ring-2 focus:ring-[#7300ff]/10"
+                          placeholder="https://example.com/file1.pdf"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex w-full flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:gap-12">

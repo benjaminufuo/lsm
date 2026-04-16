@@ -2,11 +2,12 @@ import type { Course } from "../types/admin";
 
 type Props = {
   course: Course;
+  onClick?: (courseId: string) => void;
 };
 
-export default function CourseCard({ course }: Props) {
+export default function CourseCard({ course, onClick }: Props) {
   return (
-    <article className="flex gap-3 rounded-2xl border border-slate-200/60 bg-white p-3 shadow-[0_8px_30px_rgba(0,0,0,0.05)] sm:gap-4 sm:p-4">
+    <article onClick={() => onClick?.(course.id)} className="flex cursor-pointer gap-3 rounded-2xl border border-slate-200/60 bg-white p-3 shadow-[0_8px_30px_rgba(0,0,0,0.05)] transition-all hover:border-violet-200 hover:shadow-[0_12px_40px_rgba(0,0,0,0.1)] sm:gap-4 sm:p-4">
       <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-16 sm:w-16">
         <img
           src={course.image}
