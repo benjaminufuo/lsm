@@ -49,8 +49,8 @@ const Dashboard = () => {
     {
       title: "Courses Enrolled",
       icon: BookIcon,
-      value: enrolledCourse?.data.length || 0,
-      descriptionNumber: enrolledCourse?.data.length || 0,
+      value: enrolledCourse?.data?.length || 0,
+      descriptionNumber: enrolledCourse?.data?.length || 0,
       description: "active courses",
     },
     {
@@ -141,7 +141,7 @@ const Dashboard = () => {
           </div>
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-          ) : course?.data.length ? (
+          ) : course?.data?.length ? (
             <div className="flex flex-1 flex-col gap-4">
               {course?.data.map((item) => (
                 <CourseCard
@@ -171,7 +171,7 @@ const Dashboard = () => {
         <div className="mt-8 w-full md:flex-1">
           <h2 className="text-2xl font-bold mb-4">Upcoming Assignments</h2>
           <div className="bg-white p-2.5 gap-2.5 rounded-2xl">
-            {assignment?.data.length ? (
+            {assignment?.data?.length ? (
               <div className="flex flex-col gap-4">
                 {assignment.data.map((item) => (
                   <div className=" py-1.5">
@@ -203,7 +203,7 @@ const Dashboard = () => {
           <div className="bg-white p-2.5 gap-2.5 rounded-2xl">
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-            ) : course?.data.length ? (
+            ) : course?.data?.length ? (
               <div className="flex flex-1 flex-col gap-4">
                 {course?.data.map((item) => (
                   <div className=" py-1.5">

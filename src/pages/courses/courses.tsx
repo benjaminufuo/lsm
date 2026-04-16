@@ -9,6 +9,7 @@ import { MdOutlineArrowBack } from "react-icons/md";
 
 const Cousrse = () => {
   const navigate = useNavigate();
+  const [refetch, setRefetch] = useState(false);
   const [courses, setCourses] = useState([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,6 +27,7 @@ const Cousrse = () => {
         },
       );
       console.log(response.data);
+      setRefetch((prev) => !prev);
     } catch (err) {
       setError((err as Error).message);
       console.error((err as Error).message);
@@ -42,7 +44,7 @@ const Cousrse = () => {
           },
         );
         setCourses(response.data.data);
-        if (!courses.length) return;
+        if (!courses?.length) return;
         console.log(response.data.data);
       } catch (error) {
         console.error((error as Error).message);
@@ -52,7 +54,7 @@ const Cousrse = () => {
       }
     };
     fetchCourses();
-  }, [courses]);
+  }, [refetch]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -62,7 +64,7 @@ const Cousrse = () => {
     return <div>An error occured</div>;
   }
 
-  if (!courses.length)
+  if (!courses?.length)
     return (
       <div className="">
         <button
@@ -72,7 +74,7 @@ const Cousrse = () => {
           <MdOutlineArrowBack size={18} />
           Back to Dashboard
         </button>
-        <div className="mt-10 ml-10 font-semibold text-2xl">
+        <div className="mt-10 lg:ml-10 font-semibold text-2xl px-2 lg:px-0">
           You have not enrolled in a course
         </div>
       </div>
