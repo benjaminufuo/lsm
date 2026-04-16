@@ -1,5 +1,5 @@
-import { api } from "../../../lib/api";
 import { store } from "../../../global/store";
+import { adminApi } from "./adminApi";
 import type {
   CourseResponse,
   CourseCreatePayload,
@@ -140,7 +140,7 @@ export const courseApi = {
     if (payload.thumbnail) formData.append("thumbnail", payload.thumbnail);
 
     const token = store.getState().learnFlow.userToken;
-    const response = await api.post<{ success: boolean; data: CourseResponse }>("/courses", formData, {
+    const response = await adminApi.post<{ success: boolean; data: CourseResponse }>("/courses", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -151,14 +151,14 @@ export const courseApi = {
 
   // Get all courses
   getAll: async (): Promise<CourseResponse[]> => {
-    const response = await api.get<{ success?: boolean; data?: unknown; courses?: unknown[] }>("/admin/courses", getAuthConfig());
+    const response = await adminApi.get<{ success?: boolean; data?: unknown; courses?: unknown[] }>("/admin/courses", getAuthConfig());
     const payload = response.data.data ?? response.data;
     return getCoursesFromData(payload).map(mapCourse);
   },
 
   // Get course by ID
   getById: async (courseId: string): Promise<CourseResponse> => {
-    const response = await api.get<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}`, getAuthConfig());
+    const response = await adminApi.get<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}`, getAuthConfig());
     return response.data.data;
   },
 
@@ -175,7 +175,7 @@ export const courseApi = {
     if (payload.thumbnail) formData.append("thumbnail", payload.thumbnail);
 
     const token = store.getState().learnFlow.userToken;
-    const response = await api.put<{ success: boolean; data: CourseResponse }>(
+    const response = await adminApi.put<{ success: boolean; data: CourseResponse }>(
       `/courses/${courseId}`,
       formData,
       {
@@ -190,24 +190,24 @@ export const courseApi = {
 
   // Delete course
   delete: async (courseId: string): Promise<void> => {
-    await api.delete(`/courses/${courseId}`, getAuthConfig());
+    await adminApi.delete(`/courses/${courseId}`, getAuthConfig());
   },
 
   // Publish course
   publish: async (courseId: string): Promise<CourseResponse> => {
-    const response = await api.post<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}/publish`, undefined, getAuthConfig());
+    const response = await adminApi.post<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}/publish`, undefined, getAuthConfig());
     return response.data.data;
   },
 
   // Unpublish course
   unpublish: async (courseId: string): Promise<CourseResponse> => {
-    const response = await api.post<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}/unpublish`, undefined, getAuthConfig());
+    const response = await adminApi.post<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}/unpublish`, undefined, getAuthConfig());
     return response.data.data;
   },
 
   // Create lesson for a course
   createLesson: async (courseId: string, payload: LessonCreatePayload) => {
-    const response = await api.post(
+    const response = await adminApi.post(
       `/courses/${courseId}/lessons`,
       payload,
       getAuthConfig(),
@@ -217,7 +217,7 @@ export const courseApi = {
 
   // Get all lessons for a course
   getLessonsByCourse: async (courseId: string): Promise<LessonResponse[]> => {
-    const response = await api.get<{ success?: boolean; data?: unknown; lessons?: unknown[] }>(
+    const response = await adminApi.get<{ success?: boolean; data?: unknown; lessons?: unknown[] }>(
       `/courses/${courseId}/lessons`,
       getAuthConfig(),
     );
@@ -239,7 +239,7 @@ export const courseApi = {
 
   // Get lesson by ID
   getLessonById: async (lessonId: string): Promise<LessonResponse> => {
-    const response = await api.get<{ success: boolean; data: LessonApi }>(
+    const response = await adminApi.get<{ success: boolean; data: LessonApi }>(
       `/lesson/${lessonId}`,
       getAuthConfig(),
     );
@@ -248,7 +248,7 @@ export const courseApi = {
 
   // Update lesson
   updateLesson: async (lessonId: string, payload: Partial<LessonCreatePayload>): Promise<LessonResponse> => {
-    const response = await api.put<{ success: boolean; data: LessonApi }>(
+    const response = await adminApi.put<{ success: boolean; data: LessonApi }>(
       `/lesson/${lessonId}`,
       payload,
       getAuthConfig(),
@@ -258,6 +258,6 @@ export const courseApi = {
 
   // Delete lesson
   deleteLesson: async (lessonId: string): Promise<void> => {
-    await api.delete(`/lesson/${lessonId}`, getAuthConfig());
+    await adminApi.delete(`/lesson/${lessonId}`, getAuthConfig());
   },
 };

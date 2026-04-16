@@ -6,7 +6,7 @@ import Button from "../../../shared/Button/Index";
 import Input from "../../../shared/Input/Index";
 import Loading from "../../../components/Loading";
 import { courseApi, type LessonResponse } from "../api/courseApi";
-import type { CourseCreatePayload, CourseResponse, LessonCreatePayload } from "../types/admin";
+import type { CourseCreatePayload, CourseResponse } from "../types/admin";
 
 type LessonEditDraft = LessonResponse & { isEditing?: boolean };
 
@@ -20,40 +20,63 @@ export default function AdminCourseEditPage() {
   const [lessons, setLessons] = useState<LessonEditDraft[]>([]);
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [formData, setFormData] = useState<Partial<CourseCreatePayload>>({});
-  const [showLessonModal, setShowLessonModal] = useState(false);
-  const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!courseId) return;
-    fetchCourseAndLessons();
+
+    const fetchCourseAndLessons = async () => {
+      setLoading(true);
+      try {
+        let courseData = null as CourseResponse | null;
+
+        try {
+          courseData = await courseApi.getById(courseId);
+        } catch (error) {
+          const status =
+            typeof error === "object" && error !== null && "response" in error
+              ? (error as { response?: { status?: number } }).response?.status
+              : undefined;
+
+          if (status !== 403) {
+            throw error;
+          }
+
+          const allCourses = await courseApi.getAll();
+          courseData = allCourses.find((item) => item.courseId === courseId) || null;
+        }
+
+        if (!courseData) {
+          throw new Error("Course not found");
+        }
+
+        setCourse(courseData);
+        setFormData({
+          title: courseData.courseTitle,
+          description: courseData.description,
+          category: courseData.category,
+          duration: courseData.duration,
+          difficulty: courseData.difficulty as "beginner" | "intermediate" | "advanced",
+          instructorName: courseData.instructorName,
+          instructorBio: courseData.instructorBio,
+        });
+
+        try {
+          const lessonsData = await courseApi.getLessonsByCourse(courseId);
+          setLessons(lessonsData);
+        } catch (lessonError) {
+          console.error("Error fetching lessons:", lessonError);
+          setLessons([]);
+        }
+      } catch (error) {
+        console.error("Error fetching course:", error);
+        toast.error("Failed to load course details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchCourseAndLessons();
   }, [courseId]);
-
-  const fetchCourseAndLessons = async () => {
-    setLoading(true);
-    try {
-      if (!courseId) throw new Error("Course ID missing");
-
-      const courseData = await courseApi.getById(courseId);
-      setCourse(courseData);
-      setFormData({
-        title: courseData.courseTitle,
-        description: courseData.description,
-        category: courseData.category,
-        duration: courseData.duration,
-        difficulty: courseData.difficulty as "beginner" | "intermediate" | "advanced",
-        instructorName: courseData.instructorName,
-        instructorBio: courseData.instructorBio,
-      });
-
-      const lessonsData = await courseApi.getLessonsByCourse(courseId);
-      setLessons(lessonsData);
-    } catch (error) {
-      console.error("Error fetching course:", error);
-      toast.error("Failed to load course details");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -351,11 +374,6 @@ export default function AdminCourseEditPage() {
       <div className="rounded-xl bg-white p-6 shadow-sm">
         <div className="mb-6 flex items-center justify-between gap-4">
           <h2 className="text-xl font-bold text-slate-900">Lessons ({lessons.length})</h2>
-          <Button
-            label="+ Add Lesson"
-            onClick={() => setShowLessonModal(true)}
-            className="rounded-lg bg-violet-500 text-white hover:bg-violet-600"
-          />
         </div>
 
         {lessons.length === 0 ? (
