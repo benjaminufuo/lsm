@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../global/store";
 import { MdOutlineArrowBack } from "react-icons/md";
+import Loading from "../../components/Loading";
 
 const Cousrse = () => {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ const Cousrse = () => {
   }, [refetch]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (error) {

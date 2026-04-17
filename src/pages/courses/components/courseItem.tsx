@@ -48,7 +48,7 @@ const CourseItem = ({ item, onClick }: Props) => {
       <div className="text-[14px] flex items-center justify-between my-2">
         <div className="flex items-center justify-center gap-1">
           <img src={timeIcon} alt="time-icon" />
-          {item.duration} hours
+          {item.duration} hour{item.duration <= 1 ? "" : "s"}
         </div>
         <div className="flex items-center justify-center gap-1">
           <img src={peopleIcon} alt="people-icon" />

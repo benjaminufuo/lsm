@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { persistor, type RootState } from "../global/store";
 import { HiOutlineArrowLeftOnRectangle } from "react-icons/hi2";
 import { setUserInfo, setUserToken } from "../global/slice";
+import type { UserProps } from "../lib/data";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -25,17 +26,28 @@ const Header = () => {
   const NotificationIcon = IoNotificationsOutline as IconType;
   const CloseIcon = IoClose as IconType;
 
-  const user = useSelector((state: RootState) => state.learnFlow.userInfo);
+  const user = useSelector(
+    (state: RootState) => state.learnFlow.userInfo as UserProps,
+  );
 
   const dispatch = useDispatch();
   const handleLogout = async () => {
-      // Reset user state
-      dispatch(setUserToken(""));
-      dispatch(setUserInfo({id: "", fullName: "", email: "", role: "", avatar: "", token: ""}));
-      // Purge persisted state
-      await persistor.purge();
-      navigate("/signin");
-    };
+    // Reset user state
+    dispatch(setUserToken(""));
+    dispatch(
+      setUserInfo({
+        id: "",
+        fullName: "",
+        email: "",
+        role: "",
+        avatar: "",
+        token: "",
+      }),
+    );
+    // Purge persisted state
+    await persistor.purge();
+    navigate("/signin");
+  };
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";

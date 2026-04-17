@@ -2,7 +2,7 @@ export interface CourseCardType {
   courseId: string;
   courseTitle: string;
   description: string;
-  duration: string;
+  duration: number;
   progress: string;
   courseImg: string;
   rating: number;
@@ -10,7 +10,10 @@ export interface CourseCardType {
   enrollmentCount: string;
 }
 
-export interface TopicList {
+export interface Lesson {
+  _id: string;
   title: string;
-  timeDetail: string;
+  description: string;
+  videoUrl: string;
+  duration: number;
 }

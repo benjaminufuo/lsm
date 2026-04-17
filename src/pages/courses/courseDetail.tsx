@@ -11,6 +11,10 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../global/store";
 import axios from "axios";
+import Loading from "../../components/Loading";
+import type { Lesson } from "./types/type";
+import Youtube from "react-youtube";
+import { toast } from "react-toastify";
 
 interface Course {
   courseTitle: string;
@@ -18,17 +22,9 @@ interface Course {
   instructorBio: string;
   description: string;
   duration: number;
-  lessons: [];
-  progress: string;
+  lessons: Lesson[];
+  progress: number;
   courseProgress: string;
-}
-
-interface Lesson {
-  _id: string;
-  title: string;
-  description: string;
-  videoUrl: string;
-  duration: number;
 }
 
 const CourseDetail = () => {
@@ -36,7 +32,7 @@ const CourseDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]); //
-  const [activeLesson, setActiveLesson] = useState<any | null>(null);
+  const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const navigate = useNavigate();
   const { courseId } = useParams();
   const token = useSelector((state: RootState) => state.learnFlow.userToken);
@@ -65,7 +61,7 @@ const CourseDetail = () => {
 
         if (lessonRes.status === "fulfilled") {
           setLessons(lessonRes.value.data.data);
-          console.log(lessonRes.value.data);
+          console.log(lessonRes.value.data.data);
         } else {
           setLessons([]);
           console.error(lessonRes.reason);
@@ -83,8 +79,58 @@ const CourseDetail = () => {
     "overview" | "resources" | "mynotes"
   >("overview");
 
+  const getVideoId = (url: string) => {
+    if (!url) return "";
+
+    try {
+      const parsed = new URL(url);
+
+      // youtu.be/VIDEO_ID
+      if (parsed.hostname.includes("youtu.be")) {
+        return parsed.pathname.slice(1);
+      }
+
+      // youtube.com/watch?v=VIDEO_ID
+      if (parsed.searchParams.get("v")) {
+        return parsed.searchParams.get("v") || "";
+      }
+
+      // /embed/VIDEO_ID
+      if (parsed.pathname.includes("/embed/")) {
+        return parsed.pathname.split("/embed/")[1] || "";
+      }
+
+      return "";
+    } catch {
+      return "";
+    }
+  };
+
+  const handleMarkLessonAsCompleted = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/enrollments/mark-lesson-complete`,
+        {
+          courseId: courseId,
+          lessonId: activeLesson?._id,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      console.log(response.data.data.message);
+      toast.success(
+        response.data.data.message || "Lesson marked as completed!",
+      );
+    } catch (error) {
+      console.error((error as Error).message);
+      toast.error("Failed to mark lesson as completed.");
+    }
+  };
+
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (error) {
@@ -107,15 +153,13 @@ const CourseDetail = () => {
       {/* Video Player — only shows when a lesson is selected */}
       {activeLesson && (
         <div className="w-full rounded-xl overflow-hidden bg-black mb-6">
-          <iframe
-            className="w-full aspect-video border-0"
-            height="315"
-            src={activeLesson.videoUrl}
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          ></iframe>
+          <Youtube
+            // className="w-full aspect-video border-0"
+            iframeClassName="w-full aspect-video border-0"
+            videoId={getVideoId(activeLesson.videoUrl)}
+            title={activeLesson.title}
+            onEnd={handleMarkLessonAsCompleted}
+          />
           <div className="bg-white p-4">
             <h2 className="font-bold text-[20px]">{activeLesson.title}</h2>
             <p className="text-[#64748B] mt-1 text-[14px]">
@@ -140,18 +184,22 @@ const CourseDetail = () => {
                 <img className="" src={timeIcon} alt="clock-icon" />
                 <span>
                   {" "}
-                  <span>{course.duration} hours</span> total
+                  <span>
+                    {course.duration} hour{course.duration <= 1 ? "" : "s"}
+                  </span>{" "}
+                  total
                 </span>
               </div>
               <div className="flex items-center justify-center gap-2">
                 <img src={bookIcon} alt="book-icon" />
                 <span>
                   {" "}
-                  <span>{`${course.lessons.length}`}</span> lessons
+                  <span>{`${course.lessons.length}`}</span> lesson
+                  {course.lessons.length <= 1 ? "" : "s"}
                 </span>
               </div>
               <div className="bg-white px-2 rounded-lg text-[12px] text-[#7B61FF] font-medium">
-                <span>{course.progress || "10"}%</span> complete
+                <span>{course.progress || "0"}%</span> complete
               </div>
             </div>
           </div>
@@ -164,13 +212,13 @@ const CourseDetail = () => {
                   Course Progress
                 </span>
                 <span className="font-semibold text-[#64748B]">
-                  {course.progress || "10"}%
+                  {course.progress || "0"}%
                 </span>
               </div>
               <div className="bg-[#FAF8F3] h-2 mt-2">
                 <div
                   className={`bg-[#7B61FF] h-full `}
-                  style={{ width: `${course.progress || "10"}%` }}
+                  style={{ width: `${course.progress || "0"}%` }}
                 ></div>
               </div>
             </div>
@@ -259,17 +307,17 @@ const CourseDetail = () => {
             </p>
           </div>
           <div className="">
-            {course.lessons.length === 0 ? (
+            {lessons.length === 0 ? (
               <div className="p-4 text-[#0A2540]/60">
                 No lesson for this course
               </div>
             ) : (
-              course.lessons.map((lesson, index) => (
+              lessons.map((lesson, index) => (
                 <TopicItem
                   key={index}
                   item={lesson}
                   onSelect={() => setActiveLesson(lesson)}
-                  isActive={activeLesson._id === lesson}
+                  isActive={activeLesson?._id === lesson?._id}
                 />
               ))
             )}
