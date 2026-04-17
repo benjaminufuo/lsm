@@ -14,13 +14,13 @@ const Overview = () => {
     >
       <h2 className="font-bold text-[20px]">What you'll learn</h2>
       <div>
-        {overviewContent.map((content) => (
-          <p className="mt-3 flex lg:items-center gap-3">
+        {overviewContent.map((content, index) => (
+          <div key={index} className="mt-3 flex lg:items-center gap-3">
             <div className="w-4 h-4 rounded-full border-[1.9px] border-[#64748B] flex items-center justify-center mt-2 lg:mt-0">
               <img className="" src={tickIcon} alt="tick-icon" />
             </div>
             <span className="flex-1">{content}</span>
-          </p>
+          </div>
         ))}
       </div>
     </div>

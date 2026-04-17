@@ -56,8 +56,8 @@ const Dashboard = () => {
     {
       title: "Courses Enrolled",
       icon: BookIcon,
-      value: enrolledCourse?.data.length || 0,
-      descriptionNumber: enrolledCourse?.data.length || 0,
+      value: enrolledCourse?.data?.length || 0,
+      descriptionNumber: enrolledCourse?.data?.length || 0,
       description: "active courses",
     },
     {
@@ -157,7 +157,7 @@ const Dashboard = () => {
 
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-          ) : course?.data.length ? (
+          ) : course?.data?.length ? (
             <div className="flex flex-1 flex-col gap-4">
               {course.data.map((item) => (
                 <CourseCard
@@ -217,7 +217,7 @@ const Dashboard = () => {
           <div className="gap-2.5 rounded-2xl bg-white p-2.5">
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-            ) : course?.data.length ? (
+            ) : course?.data?.length ? (
               <div className="flex flex-1 flex-col gap-4">
                 {course.data.map((item) => (
                   <div key={item.enrollmentId} className="py-1.5">
