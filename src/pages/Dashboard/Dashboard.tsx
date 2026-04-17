@@ -14,12 +14,16 @@ import {
   getActiveEnrolledCourse,
   getAssignments,
   getEnrolledCourse,
+  getAllCourses,
+  enrollInCourse,
   type UserProps,
   type ActiveEnrolledCourse,
 } from "../../lib/data";
 import SkeletonCard from "../../components/skeleton-card";
 import { PiReadCvLogoFill } from "react-icons/pi";
 import { MdAssignmentAdd } from "react-icons/md";
+import Button from "../../shared/Button/Index";
+import { toast } from "react-toastify";
 
 const Dashboard = () => {
   const token = useSelector((state: RootState) => state.learnFlow.userToken);
@@ -33,8 +37,10 @@ const Dashboard = () => {
   const [assignment, setAssignment] = useState<ActiveEnrolledCourse | null>(
     null,
   );
+  const [allCourses, setAllCourses] = useState<any>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [enrollingId, setEnrollingId] = useState<string | null>(null);
 
   const timeAgo = (dateString: string) => {
     const now = new Date();
@@ -83,6 +89,28 @@ const Dashboard = () => {
     },
   ];
 
+  const handleEnroll = async (courseId: string) => {
+    if (!courseId) return;
+    try {
+      setEnrollingId(courseId);
+      await enrollInCourse(courseId);
+      toast.success("Successfully enrolled in the course!");
+
+      // Re-fetch courses to instantly update both sections
+      const [activeEnrolledData, allCoursesData] = await Promise.all([
+        getActiveEnrolledCourse(),
+        getAllCourses().catch(() => ({ data: [] })),
+      ]);
+
+      setCourse(activeEnrolledData);
+      setAllCourses(allCoursesData);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to enroll in course");
+    } finally {
+      setEnrollingId(null);
+    }
+  };
+
   useEffect(() => {
     const loadActiveEnrolledCourses = async () => {
       try {
@@ -95,16 +123,22 @@ const Dashboard = () => {
           throw new Error("No token found");
         }
 
-        const [activeEnrolledData, assignmentsData, enrolledData] =
-          await Promise.all([
-            getActiveEnrolledCourse(),
-            getAssignments(),
-            getEnrolledCourse(),
-          ]);
+        const [
+          activeEnrolledData,
+          assignmentsData,
+          enrolledData,
+          allCoursesData,
+        ] = await Promise.all([
+          getActiveEnrolledCourse(),
+          getAssignments(),
+          getEnrolledCourse(),
+          getAllCourses().catch(() => ({ data: [] })), // Defensive catch in case of API failure
+        ]);
 
         setCourse(activeEnrolledData);
         setAssignment(assignmentsData);
         setEnrolledCourse(enrolledData);
+        setAllCourses(allCoursesData);
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
         setError(err as Error);
@@ -181,6 +215,65 @@ const Dashboard = () => {
                   <p>Enroll in a Course</p>
                 </div>
               )}
+            </div>
+          )}
+
+          <div className="mt-8 flex flex-row items-center justify-between">
+            <h2 className="md:text-2xl font-bold">Available to Enroll</h2>
+            <NavLink
+              to="/learnflow/courses"
+              className="text-primary flex flex-row items-center gap-2 text-sm"
+            >
+              <span>View all</span>
+              <span className="ml-1">
+                <ArrowRightIcon />
+              </span>
+            </NavLink>
+          </div>
+
+          {loading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <SkeletonCard key={`avail-${i}`} />
+            ))
+          ) : allCourses?.data?.length ? (
+            <div className="flex flex-1 flex-col gap-6">
+              {allCourses.data.map((item: any) => {
+                const courseId = item._id || item.id || item.courseId;
+                return (
+                  <div
+                    key={courseId || Math.random()}
+                    className="flex flex-col gap-3"
+                  >
+                    <CourseCard
+                      imageUrl={item.thumbnail || item.courseImg || item.image}
+                      title={item.title || item.courseTitle}
+                      instructor={
+                        item.instructorName ||
+                        item.instructor?.fullName ||
+                        item.instructor ||
+                        "Instructor"
+                      }
+                      progress={0} // Setting progress to 0 since they aren't enrolled yet
+                      description={
+                        item.category || item.description || "General"
+                      }
+                      percentage={item.rating || 0}
+                    />
+                    <Button
+                      onClick={() => handleEnroll(courseId)}
+                      loading={enrollingId === courseId}
+                      loadingText="Enrolling..."
+                      className="rounded-xl w-full"
+                    >
+                      Enroll Now
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-1 items-center justify-center gap-4 rounded-2xl bg-white py-12 text-gray-600">
+              <p>No new courses available to enroll.</p>
             </div>
           )}
         </div>

@@ -55,3 +55,12 @@ export const getAssignments = async () => {
   const response = await api.get<Assignment>("assignments?page=1&limit=20");
   return response.data;
 };
+export const getAllCourses = async () => {
+  const response = await api.get("/courses");
+  return response.data;
+};
+
+export const enrollInCourse = async (courseId: string) => {
+  const response = await api.post("enrollments/enroll", { courseId });
+  return response.data;
+};
