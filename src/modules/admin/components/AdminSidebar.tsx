@@ -7,9 +7,11 @@ import {
   HiOutlineArrowLeftOnRectangle,
   HiOutlineXMark,
 } from "react-icons/hi2";
-import { toast } from "react-toastify";
 import { cn } from "../../../shared/utils/cn";
 import logo from "../../../../public/preview-image.png";
+import { useDispatch } from "react-redux";
+import { persistor } from "../../../global/store";
+import { setUserToken, setUserInfo } from "../../../global/slice";
 
 type Props = {
   open: boolean;
@@ -41,12 +43,26 @@ const navItems = [
 
 export default function AdminSidebar({ open, onClose }: Props) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     onClose();
+    // Reset user state
+    dispatch(setUserToken(""));
+    dispatch(
+      setUserInfo({
+        id: "",
+        fullName: "",
+        email: "",
+        role: "",
+        avatar: "",
+        token: "",
+      }),
+    );
+    // Purge persisted state
+    await persistor.purge();
     localStorage.removeItem("token");
-    toast.info("Logout logic will be wired later.");
-    navigate("/signin");
+    navigate("/signin", { replace: true });
   };
 
   return (
