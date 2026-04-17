@@ -36,10 +36,26 @@ export type CourseCreatePayload = {
   instructorName?: string;
   instructorBio?: string;
   thumbnail?: File;
-  lessons?: string;
 };
 
 export type CourseUpdatePayload = Partial<CourseCreatePayload>;
+
+export type LessonResourcePayload = {
+  title: string;
+  url: string;
+  type: string;
+};
+
+export type LessonCreatePayload = {
+  title: string;
+  description: string;
+  content: string;
+  videoUrl: string;
+  duration: number;
+  isPreviewable?: boolean;
+  resources?: string;
+  attachments?: string[];
+};
 
 export type Course = {
   id: string;
@@ -48,6 +64,7 @@ export type Course = {
   progress: number;
   status: string;
   image: string;
+  instructorBio?: string;
 };
 
 // Assignment types

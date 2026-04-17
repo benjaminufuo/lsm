@@ -17,6 +17,7 @@ import AdminDashboardPage from "./modules/admin/pages/AdminDashboardPage";
 import AdminCoursesPage from "./modules/admin/pages/AdminCoursesPage";
 import AdminAssignmentsPage from "./modules/admin/pages/AdminAssignmentsPage.tsx";
 import AdminUsersPage from "./modules/admin/pages/AdminUsersPage";
+import AdminCourseEditPage from "./modules/admin/pages/AdminCourseEditPage";
 
 import CourseDetail from "./pages/courses/courseDetail";
 import Verify from "./auth/Verify.tsx";
@@ -103,6 +104,10 @@ const App = () => {
                 {
                   path: "courses",
                   element: <AdminCoursesPage />,
+                },
+                {
+                  path: "courses/:courseId",
+                  element: <AdminCourseEditPage />,
                 },
                 {
                   path: "assignments",

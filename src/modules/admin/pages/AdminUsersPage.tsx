@@ -89,7 +89,7 @@ export default function AdminUsersPage() {
     setCreatingUser(true);
     try {
       await userApi.create(newUserForm);
-      toast.success(`User \"${newUserForm.name}\" created successfully`);
+      toast.success(`User "${newUserForm.name}" created successfully`);
       setShowAddUserModal(false);
       setNewUserForm({ name: "", email: "", role: "student" });
 

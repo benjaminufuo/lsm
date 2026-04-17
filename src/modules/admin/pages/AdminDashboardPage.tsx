@@ -26,6 +26,8 @@ export default function AdminDashboardPage() {
   const [recentAssignments, setRecentAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showAllCourses, setShowAllCourses] = useState(false);
+  const [showAllAssignments, setShowAllAssignments] = useState(false);
 
   const goToCourses = () => navigate("/learnflow/admin/courses");
   const goToAssignments = () => navigate("/learnflow/admin/assignments");
@@ -71,6 +73,13 @@ export default function AdminDashboardPage() {
       </div>
     );
   }
+
+  const displayedCourses = showAllCourses
+    ? recentCourses
+    : recentCourses.slice(0, 3);
+  const displayedAssignments = showAllAssignments
+    ? recentAssignments
+    : recentAssignments.slice(0, 3);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 pt-3 sm:space-y-8 sm:pt-6">
@@ -155,18 +164,20 @@ export default function AdminDashboardPage() {
             <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
               Recent Course
             </h2>
-            <button
-              type="button"
-              onClick={goToCourses}
-              className="shrink-0 text-xs font-medium text-violet-500 hover:text-violet-600 sm:text-sm"
-            >
-              View All →
-            </button>
+            {recentCourses.length > 3 && (
+              <button
+                type="button"
+                onClick={() => setShowAllCourses(!showAllCourses)}
+                className="shrink-0 text-xs font-medium text-violet-500 hover:text-violet-600 sm:text-sm"
+              >
+                {showAllCourses ? "View Less ↑" : "View All →"}
+              </button>
+            )}
           </div>
 
           <div className="space-y-3 sm:space-y-4">
-            {recentCourses.length > 0 ? (
-              recentCourses.map((course) => (
+            {displayedCourses.length > 0 ? (
+              displayedCourses.map((course) => (
                 <CourseCard key={course.id} course={course} />
               ))
             ) : (
@@ -180,18 +191,20 @@ export default function AdminDashboardPage() {
             <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
               Recent Assignment
             </h2>
-            <button
-              type="button"
-              onClick={goToAssignments}
-              className="shrink-0 text-xs font-medium text-violet-500 hover:text-violet-600 sm:text-sm"
-            >
-              View All →
-            </button>
+            {recentAssignments.length > 3 && (
+              <button
+                type="button"
+                onClick={() => setShowAllAssignments(!showAllAssignments)}
+                className="shrink-0 text-xs font-medium text-violet-500 hover:text-violet-600 sm:text-sm"
+              >
+                {showAllAssignments ? "View Less ↑" : "View All →"}
+              </button>
+            )}
           </div>
 
           <div className="space-y-3 sm:space-y-4">
-            {recentAssignments.length > 0 ? (
-              recentAssignments.map((assignment) => (
+            {displayedAssignments.length > 0 ? (
+              displayedAssignments.map((assignment) => (
                 <AssignmentCard
                   key={assignment.id}
                   assignment={assignment}

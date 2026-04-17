@@ -1,6 +1,58 @@
-import { api } from "../../../lib/api";
 import { store } from "../../../global/store";
-import type { CourseResponse, CourseCreatePayload, CourseUpdatePayload } from "../types/admin";
+import { adminApi } from "./adminApi";
+import type {
+  CourseResponse,
+  CourseCreatePayload,
+  CourseUpdatePayload,
+  LessonCreatePayload,
+} from "../types/admin";
+
+type LessonApi = {
+  _id?: string;
+  lessonId?: string;
+  id?: string;
+  title?: string;
+  description?: string;
+  content?: string;
+  videoUrl?: string;
+  duration?: number;
+  order?: number;
+  isPreviewable?: boolean;
+  course?: string;
+  attachments?: unknown[];
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type LessonResponse = {
+  lessonId: string;
+  title: string;
+  description: string;
+  content: string;
+  videoUrl: string;
+  duration: number;
+  order: number;
+  isPreviewable: boolean;
+  course: string;
+  attachments: unknown[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+const mapLesson = (lesson: LessonApi): LessonResponse => ({
+  lessonId: lesson.lessonId || lesson._id || lesson.id || "",
+  title: lesson.title || "",
+  description: lesson.description || "",
+  content: lesson.content || "",
+  videoUrl: lesson.videoUrl || "",
+  duration: lesson.duration || 0,
+  order: lesson.order || 0,
+  isPreviewable: lesson.isPreviewable || false,
+  course: lesson.course || "",
+  attachments: lesson.attachments || [],
+  createdAt: lesson.createdAt || "",
+  updatedAt: lesson.updatedAt || "",
+});
 
 type CourseListApi = {
   id?: string;
@@ -86,10 +138,9 @@ export const courseApi = {
     if (payload.instructorName) formData.append("instructorName", payload.instructorName);
     if (payload.instructorBio) formData.append("instructorBio", payload.instructorBio);
     if (payload.thumbnail) formData.append("thumbnail", payload.thumbnail);
-    if (payload.lessons) formData.append("lessons", payload.lessons);
 
     const token = store.getState().learnFlow.userToken;
-    const response = await api.post<{ success: boolean; data: CourseResponse }>("/courses", formData, {
+    const response = await adminApi.post<{ success: boolean; data: CourseResponse }>("/courses", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -100,14 +151,14 @@ export const courseApi = {
 
   // Get all courses
   getAll: async (): Promise<CourseResponse[]> => {
-    const response = await api.get<{ success?: boolean; data?: unknown; courses?: unknown[] }>("/admin/courses", getAuthConfig());
+    const response = await adminApi.get<{ success?: boolean; data?: unknown; courses?: unknown[] }>("/admin/courses", getAuthConfig());
     const payload = response.data.data ?? response.data;
     return getCoursesFromData(payload).map(mapCourse);
   },
 
   // Get course by ID
   getById: async (courseId: string): Promise<CourseResponse> => {
-    const response = await api.get<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}`, getAuthConfig());
+    const response = await adminApi.get<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}`, getAuthConfig());
     return response.data.data;
   },
 
@@ -122,10 +173,9 @@ export const courseApi = {
     if (payload.instructorName) formData.append("instructorName", payload.instructorName);
     if (payload.instructorBio) formData.append("instructorBio", payload.instructorBio);
     if (payload.thumbnail) formData.append("thumbnail", payload.thumbnail);
-    if (payload.lessons) formData.append("lessons", payload.lessons);
 
     const token = store.getState().learnFlow.userToken;
-    const response = await api.put<{ success: boolean; data: CourseResponse }>(
+    const response = await adminApi.put<{ success: boolean; data: CourseResponse }>(
       `/courses/${courseId}`,
       formData,
       {
@@ -140,18 +190,74 @@ export const courseApi = {
 
   // Delete course
   delete: async (courseId: string): Promise<void> => {
-    await api.delete(`/courses/${courseId}`, getAuthConfig());
+    await adminApi.delete(`/courses/${courseId}`, getAuthConfig());
   },
 
   // Publish course
   publish: async (courseId: string): Promise<CourseResponse> => {
-    const response = await api.post<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}/publish`, undefined, getAuthConfig());
+    const response = await adminApi.post<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}/publish`, undefined, getAuthConfig());
     return response.data.data;
   },
 
   // Unpublish course
   unpublish: async (courseId: string): Promise<CourseResponse> => {
-    const response = await api.post<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}/unpublish`, undefined, getAuthConfig());
+    const response = await adminApi.post<{ success: boolean; data: CourseResponse }>(`/courses/${courseId}/unpublish`, undefined, getAuthConfig());
     return response.data.data;
+  },
+
+  // Create lesson for a course
+  createLesson: async (courseId: string, payload: LessonCreatePayload) => {
+    const response = await adminApi.post(
+      `/courses/${courseId}/lessons`,
+      payload,
+      getAuthConfig(),
+    );
+    return response.data;
+  },
+
+  // Get all lessons for a course
+  getLessonsByCourse: async (courseId: string): Promise<LessonResponse[]> => {
+    const response = await adminApi.get<{ success?: boolean; data?: unknown; lessons?: unknown[] }>(
+      `/courses/${courseId}/lessons`,
+      getAuthConfig(),
+    );
+    const payload = response.data.data ?? response.data;
+
+    let lessons: LessonApi[] = [];
+    if (Array.isArray(payload)) {
+      lessons = payload as LessonApi[];
+    } else if (payload && typeof payload === "object") {
+      const record = payload as Record<string, unknown>;
+      if (Array.isArray(record.lessons)) lessons = record.lessons as LessonApi[];
+      else if (Array.isArray(record.items)) lessons = record.items as LessonApi[];
+      else if (Array.isArray(record.results)) lessons = record.results as LessonApi[];
+      else if (Array.isArray(record.docs)) lessons = record.docs as LessonApi[];
+    }
+
+    return lessons.map(mapLesson);
+  },
+
+  // Get lesson by ID
+  getLessonById: async (lessonId: string): Promise<LessonResponse> => {
+    const response = await adminApi.get<{ success: boolean; data: LessonApi }>(
+      `/lesson/${lessonId}`,
+      getAuthConfig(),
+    );
+    return mapLesson(response.data.data);
+  },
+
+  // Update lesson
+  updateLesson: async (lessonId: string, payload: Partial<LessonCreatePayload>): Promise<LessonResponse> => {
+    const response = await adminApi.put<{ success: boolean; data: LessonApi }>(
+      `/lesson/${lessonId}`,
+      payload,
+      getAuthConfig(),
+    );
+    return mapLesson(response.data.data);
+  },
+
+  // Delete lesson
+  deleteLesson: async (lessonId: string): Promise<void> => {
+    await adminApi.delete(`/lesson/${lessonId}`, getAuthConfig());
   },
 };
