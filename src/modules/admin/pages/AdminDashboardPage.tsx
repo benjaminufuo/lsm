@@ -17,25 +17,20 @@ import type { Assignment, Course } from "../types/admin";
 import type { AdminDashboardStats } from "../types/dashboard";
 import Loading from "../../../components/Loading";
 import { useSelector } from "react-redux";
-import type { RootState } from "../../../global/store";
-import type { UserProps } from "../../../lib/definition";
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
-  const userInfo = useSelector((state: RootState) => state.learnFlow.userInfo);
-  const userFullName =
-    userInfo && typeof userInfo === "object" && "fullName" in userInfo
-      ? (userInfo as UserProps).fullName
-      : "";
+  const userInfo = useSelector((state: any) => state?.learnFlow?.userInfo);
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [recentCourses, setRecentCourses] = useState<Course[]>([]);
   const [recentAssignments, setRecentAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showAllCourses, setShowAllCourses] = useState(false);
+  const [showAllAssignments, setShowAllAssignments] = useState(false);
 
   const goToCourses = () => navigate("/learnflow/admin/courses");
   const goToAssignments = () => navigate("/learnflow/admin/assignments");
-  const goToEditCourse = (courseId: string) => navigate(`/learnflow/admin/courses/${courseId}`);
 
   const handleViewSubmissions = (id: string) => {
     navigate(`/learnflow/admin/adminSubmissions/${id}`);
@@ -79,11 +74,18 @@ export default function AdminDashboardPage() {
     );
   }
 
+  const displayedCourses = showAllCourses
+    ? recentCourses
+    : recentCourses.slice(0, 3);
+  const displayedAssignments = showAllAssignments
+    ? recentAssignments
+    : recentAssignments.slice(0, 3);
+
   return (
     <div className="mx-auto max-w-7xl space-y-6 pt-3 sm:space-y-8 sm:pt-6">
       <section className="hidden sm:block">
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-          Welcome back, {userFullName.split(" ")[0] || "Admin"} 👋
+          Welcome back, {userInfo?.fullName?.split(" ")[0] || "Admin"} 👋
         </h1>
         <p className="mt-2 text-sm text-slate-500 sm:text-base">
           Upload and manage your course and assignments.
@@ -162,19 +164,21 @@ export default function AdminDashboardPage() {
             <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
               Recent Course
             </h2>
-            <button
-              type="button"
-              onClick={goToCourses}
-              className="shrink-0 text-xs font-medium text-violet-500 hover:text-violet-600 sm:text-sm"
-            >
-              View All →
-            </button>
+            {recentCourses.length > 3 && (
+              <button
+                type="button"
+                onClick={() => setShowAllCourses(!showAllCourses)}
+                className="shrink-0 text-xs font-medium text-violet-500 hover:text-violet-600 sm:text-sm"
+              >
+                {showAllCourses ? "View Less ↑" : "View All →"}
+              </button>
+            )}
           </div>
 
           <div className="space-y-3 sm:space-y-4">
-            {recentCourses.length > 0 ? (
-              recentCourses.map((course) => (
-                <CourseCard key={course.id} course={course} onClick={goToEditCourse} />
+            {displayedCourses.length > 0 ? (
+              displayedCourses.map((course) => (
+                <CourseCard key={course.id} course={course} />
               ))
             ) : (
               <p className="text-sm text-slate-500">No recent courses found.</p>
@@ -187,18 +191,20 @@ export default function AdminDashboardPage() {
             <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
               Recent Assignment
             </h2>
-            <button
-              type="button"
-              onClick={goToAssignments}
-              className="shrink-0 text-xs font-medium text-violet-500 hover:text-violet-600 sm:text-sm"
-            >
-              View All →
-            </button>
+            {recentAssignments.length > 3 && (
+              <button
+                type="button"
+                onClick={() => setShowAllAssignments(!showAllAssignments)}
+                className="shrink-0 text-xs font-medium text-violet-500 hover:text-violet-600 sm:text-sm"
+              >
+                {showAllAssignments ? "View Less ↑" : "View All →"}
+              </button>
+            )}
           </div>
 
           <div className="space-y-3 sm:space-y-4">
-            {recentAssignments.length > 0 ? (
-              recentAssignments.map((assignment) => (
+            {displayedAssignments.length > 0 ? (
+              displayedAssignments.map((assignment) => (
                 <AssignmentCard
                   key={assignment.id}
                   assignment={assignment}

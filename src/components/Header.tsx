@@ -5,7 +5,7 @@ import {
 } from "react-icons/io5";
 import type { IconType } from "react-icons";
 import TestImage from "../assets/testImg.jpg";
-import LogoIcon from "../assets/icons/logo.svg?react";
+import LogoIcon from "../../public/preview-image.png";
 import LearnFlowIcon from "../assets/icons/learnflow.svg?react";
 import HamburgerIcon from "../assets/icons/hamburger.svg?react";
 import { useEffect, useState } from "react";
@@ -46,7 +46,8 @@ const Header = () => {
     );
     // Purge persisted state
     await persistor.purge();
-    navigate("/signin");
+    localStorage.removeItem("token");
+    navigate("/signin", { replace: true });
   };
 
   useEffect(() => {
@@ -89,7 +90,7 @@ const Header = () => {
 
       <div className="flex flex-row items-center justify-between text-white p-2 bg-white md:hidden">
         <div className="flex flex-row items-center gap-2">
-          <LogoIcon />
+          <img src={LogoIcon} alt="Logo" className="h-8 w-8 object-contain" />
           <div
             className="
               text-xl text-black whitespace-nowrap overflow-hidden
@@ -150,7 +151,11 @@ const Header = () => {
                 className="flex flex-col p-6  "
               >
                 <div className="flex flex-row items-center gap-2 text-white px-2 rounded-2xl shrink-0 overflow-hidden my-4">
-                  <LogoIcon />
+                  <img
+                    src={LogoIcon}
+                    alt="Logo"
+                    className="h-8 w-8 object-contain"
+                  />
                   <div
                     className="
               text-xl text-black whitespace-nowrap overflow-hidden
