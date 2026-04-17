@@ -25,6 +25,7 @@ export function mapDashboardCourseToCourse(
     id: c.courseId || c._id || "",
     title: c.courseTitle || c.title || c.category || "Untitled Course",
     instructor: instructorName || "No instructor",
+    instructorBio: c.instructorBio || "No bio available",
     progress: c.status === "published" ? 100 : 0,
     status: c.status || "unknown",
     image: c.courseImg?.trim()

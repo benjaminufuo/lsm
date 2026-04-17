@@ -17,10 +17,20 @@ const SideBar = () => {
   const handleLogout = async () => {
     // Reset user state
     dispatch(setUserToken(""));
-      dispatch(setUserInfo({id: "", fullName: "", email: "", role: "", avatar: "", token: ""}));
+    dispatch(
+      setUserInfo({
+        id: "",
+        fullName: "",
+        email: "",
+        role: "",
+        avatar: "",
+        token: "",
+      }),
+    );
     // Purge persisted state
     await persistor.purge();
-    navigate("/signin");
+    localStorage.removeItem("token");
+    navigate("/signin", { replace: true });
   };
   return (
     <div

@@ -131,16 +131,23 @@ const SignUp = () => {
         );
 
         const token = response?.data?.data?.token || response?.data?.token;
-        const user = response?.data?.data || response?.data?.user;
+        const user =
+          response?.data?.data?.user ||
+          response?.data?.data ||
+          response?.data?.user;
+        const userRole = user?.role || response?.data?.data?.role || "";
 
         if (token) {
+          localStorage.setItem("token", token);
           dispatch(setUserToken(token));
           dispatch(setUserInfo(user));
+          toast.success(response?.data?.message || "Logged in successfully!");
+          navigate(
+            userRole?.toLowerCase() === "admin"
+              ? "/learnflow/admin"
+              : "/learnflow/dashboard",
+          );
         }
-        toast.success(response?.data?.message || "Logged in successfully!");
-        navigate(
-          user?.role === "admin" ? "/learnflow/admin" : "/learnflow/dashboard",
-        );
       } catch (error: any) {
         toast.error(
           error.response?.data?.message ||

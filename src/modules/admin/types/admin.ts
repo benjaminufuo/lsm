@@ -14,6 +14,7 @@ export type Course = {
   progress: number;
   status: string;
   image: string;
+  instructorBio?: string;
 };
 
 export type Assignment = {
