@@ -7,13 +7,16 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../global/store";
 import { MdOutlineArrowBack } from "react-icons/md";
 import Loading from "../../components/Loading";
+import type { CourseCardType } from "./types/type";
 
 const Cousrse = () => {
   const navigate = useNavigate();
   const [refetch, setRefetch] = useState(false);
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState<CourseCardType[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState<string | null>(null);
   const token = useSelector((state: RootState) => state.learnFlow.userToken);
   const handleDropCourse = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -57,6 +60,14 @@ const Cousrse = () => {
     fetchCourses();
   }, [refetch]);
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [query]);
+
   if (loading) {
     return <Loading />;
   }
@@ -81,6 +92,12 @@ const Cousrse = () => {
       </div>
     );
 
+  const filteredCourses = debouncedQuery
+    ? courses.filter((course) =>
+        course.courseTitle.toLowerCase().includes(debouncedQuery.toLowerCase()),
+      )
+    : courses;
+
   return (
     <div className="pb-8 px-2">
       <div className="">
@@ -97,6 +114,7 @@ const Cousrse = () => {
             className="text-[14px] bg-white border-2 border-[#E2E8F0] focus:outline-none rounded-[10px] pl-[44px] pr-[16px] py-2 w-full"
             placeholder="Search courses..."
             type="search"
+            onChange={(e) => setQuery(e.target.value)}
           />
           <div className="bg-[#E5E5E5E5] border border-[#E2E8F0] px-4 py-2 rounded-[10px] flex items-center justify-center gap-2">
             <img className="w-[16px]" src={filterIcon} alt="filter icon" />
@@ -107,7 +125,7 @@ const Cousrse = () => {
         </div>
       </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 mt-4 gap-7 lg:w-[96%]">
-        {courses.map((course) => (
+        {filteredCourses.map((course) => (
           <CourseItem item={course} onClick={handleDropCourse} />
         ))}
       </div>
