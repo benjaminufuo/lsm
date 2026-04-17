@@ -1,17 +1,19 @@
 export interface CourseCardType {
-  id: string;
-  courseImage?: string;
+  courseId: string;
   courseTitle: string;
-  courseDescription?: string;
-  lessonCount?: string;
-  instructor: { name: string; description: string; image: string };
-  timeDetail: string;
-  peopleDetail: string;
-  ratingDetail: string;
-  courseProgress: string;
+  description: string;
+  duration: number;
+  progress: string;
+  courseImg: string;
+  rating: number;
+  instructorName: string;
+  enrollmentCount: string;
 }
 
-export interface TopicList {
+export interface Lesson {
+  _id: string;
   title: string;
-  timeDetail: string;
+  description: string;
+  videoUrl: string;
+  duration: number;
 }
