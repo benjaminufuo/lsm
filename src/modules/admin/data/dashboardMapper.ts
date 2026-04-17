@@ -11,6 +11,7 @@ type MappableDashboardCourse = Omit<AdminDashboardCourse, "instructor"> & {
   courseImg?: string;
   thumbnail?: string;
   instructorName?: string;
+  instructorBio?: string;
   instructor?:
     | string
     | {

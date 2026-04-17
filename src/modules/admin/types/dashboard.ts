@@ -15,6 +15,7 @@ export type AdminDashboardCourse = {
   thumbnail: string;
   createdAt: string;
   enrolledStudents: number;
+  instructorBio?: string;
 };
 
 export type AdminDashboardAssignment = {
