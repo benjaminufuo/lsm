@@ -1,8 +1,8 @@
 import type { Lesson } from "../types/type";
 import timeIcon from "../../../assets/clock-icon-svg.svg";
-import tickIcon from "../../../assets/tick-icon.svg";
-import { PiCheckCircleFill, PiCheckCircle } from "react-icons/pi";
-
+// import tickIcon from "../../../assets/tick-icon.svg";
+import { PiCheckCircle } from "react-icons/pi";
+// PiCheckCircleFill,
 interface Props {
   item: Lesson;
   onSelect: () => void;
