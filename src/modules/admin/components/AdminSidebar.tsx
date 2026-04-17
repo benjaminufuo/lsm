@@ -7,7 +7,6 @@ import {
   HiOutlineArrowLeftOnRectangle,
   HiOutlineXMark,
 } from "react-icons/hi2";
-import { toast } from "react-toastify";
 import { cn } from "../../../shared/utils/cn";
 import logo from "../../../../public/preview-image.png";
 import { useDispatch } from "react-redux";
