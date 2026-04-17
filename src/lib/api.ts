@@ -6,7 +6,7 @@ if (!BASE_URL) {
   throw new Error("VITE_BASE_URL is not defined");
 }
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: BASE_URL,
 });
 

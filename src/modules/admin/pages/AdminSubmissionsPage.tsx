@@ -10,6 +10,30 @@ import {
   type Submission,
 } from "../data/assignmentsApi";
 
+type ApiErrorResponse = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (typeof error === "object" && error !== null) {
+    const apiError = error as ApiErrorResponse;
+    const message = apiError.response?.data?.message;
+    if (typeof message === "string" && message.trim()) {
+      return message;
+    }
+  }
+
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
 export default function AdminSubmissionsPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -27,15 +51,10 @@ export default function AdminSubmissionsPage() {
       try {
         setLoading(true);
         const data = await getAssignmentSubmissions(id);
-        // Extract defensively in case the backend nests it in a data property
-        const submissionsList = Array.isArray(data)
-          ? data
-          : (data as any)?.data || [];
+        const submissionsList = Array.isArray(data.data) ? data.data : [];
         setSubmissions(submissionsList);
-      } catch (error: any) {
-        toast.error(
-          error?.response?.data?.message || "Failed to load submissions.",
-        );
+      } catch (error: unknown) {
+        toast.error(getErrorMessage(error, "Failed to load submissions."));
       } finally {
         setLoading(false);
       }
@@ -76,8 +95,8 @@ export default function AdminSubmissionsPage() {
       setGradingId(null);
       setGradeInput("");
       setFeedbackInput("");
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to submit grade.");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to submit grade."));
     } finally {
       setIsSubmitting(false);
     }

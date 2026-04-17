@@ -7,6 +7,56 @@ export type AdminNavItem = {
   icon: IconType;
 };
 
+// Course types matching backend schema
+export type CourseResponse = {
+  courseId: string;
+  courseTitle: string;
+  description: string;
+  category: string;
+  instructorName: string;
+  instructorBio: string;
+  createdBy: string;
+  courseImg: string;
+  difficulty: string;
+  duration: number;
+  status: "draft" | "published";
+  lessons: string[];
+  enrollmentCount: number;
+  rating: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CourseCreatePayload = {
+  title: string;
+  description: string;
+  category?: string;
+  duration?: number;
+  difficulty?: string;
+  instructorName?: string;
+  instructorBio?: string;
+  thumbnail?: File;
+};
+
+export type CourseUpdatePayload = Partial<CourseCreatePayload>;
+
+export type LessonResourcePayload = {
+  title: string;
+  url: string;
+  type: string;
+};
+
+export type LessonCreatePayload = {
+  title: string;
+  description: string;
+  content: string;
+  videoUrl: string;
+  duration: number;
+  isPreviewable?: boolean;
+  resources?: string;
+  attachments?: string[];
+};
+
 export type Course = {
   id: string;
   title: string;
@@ -17,6 +67,30 @@ export type Course = {
   instructorBio?: string;
 };
 
+// Assignment types
+export type AssignmentResponse = {
+  assignmentId: string;
+  title: string;
+  description: string;
+  course: string;
+  dueDate: string;
+  totalMarks?: number;
+  attachment?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AssignmentCreatePayload = {
+  title: string;
+  description: string;
+  course: string;
+  dueDate: string;
+  totalMarks?: number;
+  attachment?: File;
+};
+
+export type AssignmentUpdatePayload = Partial<AssignmentCreatePayload>;
+
 export type Assignment = {
   id: string;
   title: string;
@@ -25,6 +99,7 @@ export type Assignment = {
   image: string;
 };
 
+// User types
 export type UserTab = "students" | "admins";
 
 export type StudentUser = {
@@ -44,4 +119,23 @@ export type AdminUser = {
   email: string;
   joined: string;
   avatar: string;
+};
+
+export type UserCreatePayload = {
+  name: string;
+  email: string;
+  role: "student" | "admin";
+};
+
+export type UserProfile = {
+  _id: string;
+  fullName: string;
+  email: string;
+  role: "student" | "admin";
+  avatar: string;
+  bio: string;
+  location: string;
+  skills: string[];
+  createdAt: string;
+  updatedAt: string;
 };
